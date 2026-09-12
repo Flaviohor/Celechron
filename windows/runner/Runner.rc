@@ -89,19 +89,19 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "org.cc" "\0"
-            VALUE "FileDescription", "celechron" "\0"
+            VALUE "CompanyName", "Celechron" "\0"
+            VALUE "FileDescription", "Celechron - 课程表与学业助手" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "celechron" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2023 org.cc. All rights reserved." "\0"
-            VALUE "OriginalFilename", "celechron.exe" "\0"
-            VALUE "ProductName", "celechron" "\0"
+            VALUE "InternalName", "Celechron" "\0"
+            VALUE "LegalCopyright", "Copyright (C) Celechron contributors. Licensed under MPL-2.0." "\0"
+            VALUE "OriginalFilename", "Celechron.exe" "\0"
+            VALUE "ProductName", "Celechron" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x409, 1252
+        VALUE "Translation", 0x409, 1200
     END
 END
 

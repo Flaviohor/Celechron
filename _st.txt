@@ -1,0 +1,4 @@
+﻿NOT_RUNNING
+---
+CAP_TXT_EXISTS=False
+PNG_EXISTS=False
