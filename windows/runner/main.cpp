@@ -26,8 +26,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
 
   FlutterWindow window(project);
   Win32Window::Point origin(10, 10);
-  Win32Window::Size size(1280, 720);
-  if (!window.Create(L"celechron", origin, size)) {
+  // 桌面端按窗口尺寸给出默认值：宽屏时 HomePage 会切换到左侧导航栏布局，
+  // 因此初始尺寸留成横向而不是手机竖屏比例。
+  Win32Window::Size size(1100, 760);
+  if (!window.Create(L"Celechron", origin, size)) {
     return EXIT_FAILURE;
   }
   window.SetQuitOnClose(true);

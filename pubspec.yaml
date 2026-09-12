@@ -28,7 +28,8 @@ dependencies:
       url: https://github.com/Celechron/flutter_workmanager.git
       ref: main
       path: workmanager
-  flutter_local_notifications: ^17.2.4
+  # 17.x 不支持 Windows；Windows（C++/WinRT Toast）自 19.0.0 起提供。
+  flutter_local_notifications: ^22.0.0
   flutter_secure_storage: ^9.2.4
   qr_flutter:
   app_links:

@@ -11,6 +11,7 @@ import 'package:celechron/page/calendar/calendar_view.dart';
 import 'package:celechron/page/option/option_view.dart';
 
 import 'package:celechron/worker/fuse.dart';
+import 'package:celechron/utils/platform_features.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});
@@ -46,8 +47,58 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
+  /// 桌面端切换到侧边导航的宽度阈值。
+  static const double desktopBreakpoint = 700;
+
   @override
   Widget build(BuildContext context) {
+    final useSidebar = PlatformFeatures.isDesktop &&
+        MediaQuery.of(context).size.width >= desktopBreakpoint;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+      ),
+      child:
+          useSidebar ? _buildSidebarLayout(context) : _buildTabLayout(context),
+    );
+  }
+
+  /// 桌面宽屏布局：左侧导航栏 + 内容区。
+  ///
+  /// 底部标签栏是按手机竖屏设计的，在 1000+ 宽度的窗口里横向拉伸后留白过多，
+  /// 所以宽屏改成侧边导航。内容区仍复用 PageView，只是禁用了拖拽，
+  /// 保留原有的页面保活与滚动位置行为。
+  Widget _buildSidebarLayout(BuildContext context) {
+    final ScrollBehavior scrollBehavior = ScrollConfiguration.of(context);
+    final Widget content = HeroMode(
+      enabled: false,
+      child: PageView(
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(),
+        onPageChanged: (index) {
+          if (index != _indexNum) {
+            setState(() {
+              _indexNum = index;
+            });
+          }
+        },
+        scrollBehavior: scrollBehavior.copyWith(scrollbars: false),
+        children: _pages,
+      ),
+    );
+    return Row(
+      children: [
+        _SidebarNav(
+          currentIndex: _indexNum,
+          onSelected: (int index) => _pageController.jumpToPage(index),
+        ),
+        Expanded(child: content),
+      ],
+    );
+  }
+
+  /// 手机竖屏布局：底部标签栏 + 可横向拖动切页。
+  Widget _buildTabLayout(BuildContext context) {
     final tabBar = CupertinoTabBar(
       iconSize: 26,
       backgroundColor: CupertinoDynamicColor.resolve(
@@ -185,6 +236,82 @@ class _HomePageState extends State<HomePage> {
 
 // 离屏页面保活：保留滚动位置等临时状态，等价于原先 CupertinoTabScaffold
 // 对已构建标签页的常驻行为
+/// 桌面端左侧导航栏。用 Cupertino 组件手写而不用 Material 的 NavigationRail，
+/// 避免引入 Material 主题与当前 GetCupertinoApp 冲突。
+class _SidebarNav extends StatelessWidget {
+  const _SidebarNav({required this.currentIndex, required this.onSelected});
+
+  final int currentIndex;
+  final ValueChanged<int> onSelected;
+
+  static const List<(IconData, String)> items = <(IconData, String)>[
+    (CupertinoIcons.time, '接下来'),
+    (CupertinoIcons.calendar, '日程'),
+    (CupertinoIcons.check_mark, '任务'),
+    (Icons.school_rounded, '学业'),
+    (CupertinoIcons.settings, '设置'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 92,
+      color: CupertinoDynamicColor.resolve(
+          CupertinoColors.secondarySystemBackground, context),
+      child: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 16),
+            for (var i = 0; i < items.length; i++)
+              _SidebarItem(
+                icon: items[i].$1,
+                label: items[i].$2,
+                selected: i == currentIndex,
+                onTap: () => onSelected(i),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SidebarItem extends StatelessWidget {
+  const _SidebarItem({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color color = selected
+        ? CupertinoTheme.of(context).primaryColor
+        : CupertinoDynamicColor.resolve(CupertinoColors.systemGrey, context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: CupertinoButton(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        onPressed: onTap,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: color, size: 24),
+            const SizedBox(height: 4),
+            Text(label, style: TextStyle(fontSize: 12, color: color)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _KeepAlivePage extends StatefulWidget {
   const _KeepAlivePage({required this.child});
 
