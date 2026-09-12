@@ -10,19 +10,39 @@
 
 ## 一、当前状态
 
+**已完成，含运行时实测与分发打包。**
+
 | 项目 | 结果 |
 |---|---|
 | 依赖解析（134 个包） | ✅ 通过 |
 | `flutter analyze` | ✅ **0 error**（剩余 26 条为上游原有 warning/info） |
-| `flutter build windows --debug` | ✅ **编译成功** |
-| `flutter build windows`（release） | ✅ **编译成功** |
-| 产物 | `build/windows/x64/runner/Release/`，32MB |
+| `flutter build windows --debug` | ✅ 编译成功 |
+| `flutter build windows`（release） | ✅ 编译成功 |
+| 运行时实测 | ✅ 启动稳定、登录成功、数据抓取正常（结论见下） |
+| 便携版 zip | ✅ `dist/Celechron-1.3.0-windows-x64-portable.zip`（14.2 MB） |
+| 单文件安装器 | ✅ `dist/Celechron-1.3.0-windows-x64-setup.exe`（11.2 MB，已实测安装） |
 
 Release 包结构完整：`Celechron.exe`、`flutter_windows.dll`（引擎 21MB）、
 6 个插件 DLL、`data/app.so`（AOT 快照 8.4MB）、`data/icudtl.dat`、`data/flutter_assets/`。
 
-> **运行时尚未实测。** 编译期已全部通过，但「启动是否正常、通知是否弹出、
-> 桌面布局效果如何」需要真正跑一次才能确认。见第七节。
+### 运行时实测结论
+
+实际启动并观察了 60 秒以上，用截图和进程状态校验：
+
+- 窗口以 1100×760 逻辑尺寸创建（`windows/runner/main.cpp` 的改动生效）
+- 左侧导航栏正常渲染：接下来 / 日程 / 任务 / 学业 / 设置，图标与中文标签都对
+- 窄窗口（< 700px）自动切回底部标签栏，自适应断点生效
+- 真实登录成功，`dbuser.hive` 30KB、`dboriginalwebpage.hive` 44KB 落盘 →
+  说明浙大服务端抓取链路在 Windows 上完全可用
+- 诊断日志出现 `后台刷新检测到活跃前台或同账号任务，已正常让行` →
+  后台刷新重构后的让行逻辑真实生效，无异常抛出
+
+> 一个示例截图保存在 `dist/` 之外的会话记录里；界面为深色模式是因为系统主题是深色，
+> 与移植改动无关。
+
+> **注意**：本机显示缩放是 200%（DPI 192）。窗口逻辑尺寸 1100×760，
+> 物理尺寸 2200×1520；非 DPI 感知的工具（如 PowerShell 直接读 `GetWindowRect`）
+> 会报 1100×760 的虚拟化坐标，排查布局问题时别被这个误导。
 
 ---
 
@@ -52,6 +72,55 @@ cd /e/celechron-windows
 产物：`build/windows/x64/runner/Release/Celechron.exe`
 
 脚本会自动做三件事：加载环境变量、生成插件链接、调用 flutter。
+
+## 三之二、打包分发
+
+```bash
+python tool/package.py         # 便携版：dist/Celechron-<ver>-windows-x64/ + portable.zip
+python tool/make_installer.py  # 单文件安装器：dist/Celechron-<ver>-windows-x64-setup.exe
+```
+
+### 便携版（zip）
+
+解压即用，无需安装、无需管理员。**自带 VC++ 运行时**——`Celechron.exe` 依赖
+`MSVCP140.dll` / `VCRUNTIME140.dll`（用 `dumpbin /dependents` 确认过），干净机器上
+没装 VC++ 可再发行包会直接启动失败。所以从 VS 的可再发行目录取官方 CRT 文件做
+app-local 部署（微软官方支持的方式），包内自带，不依赖装机环境。
+
+### 安装器（单文件 exe）
+
+**没用 Inno Setup**：本机没装，且当前网络下从 GitHub 拉 10.6MB 安装包屡次被代理
+截断（每次响应上限约 512KB，分块/续传都试过）。改用 Windows 内置的 **IExpress**
+配合 7-Zip 的 LZMA2 压缩，同样产出单个 Setup.exe。
+
+结构（IExpress 包内**保持扁平、不放子目录**，因为 IExpress 对子目录支持不可靠）：
+
+```
+Celechron-1.3.0-windows-x64-setup.exe
+  └─ 自解压到临时目录后执行 install.cmd
+       ├─ Celechron.7z    整个应用（含 CRT）
+       ├─ 7z.exe / 7z.dll 解压用
+       ├─ install.cmd     ASCII 入口，转调 PowerShell
+       ├─ install.ps1     安装逻辑（UTF-8 BOM 保存，才能写中文）
+       └─ uninstall.ps1   卸载逻辑
+```
+
+安装动作：解压到 `%LOCALAPPDATA%\Programs\Celechron`（按用户安装，不弹 UAC）→
+创建开始菜单和桌面快捷方式 → 注册 `celechron://` 协议到 `HKCU\Software\Classes` →
+在「应用和功能」里注册卸载项 → 启动应用。
+
+卸载：结束进程、删快捷方式、清理注册表（协议 + 卸载项），然后由 `%TEMP%` 的
+副本删除安装目录（避免脚本删自己所在目录）。**用户数据不删**，只在结束时告知位置。
+
+实测安装结果：28 个文件 / 32.7MB，快捷方式指向正确，协议命令
+`"...\Celechron.exe" "%1"` 正确，卸载项字段完整，安装后的程序能正常启动。
+
+> 两个坑：`$env:APPDATA` 在某些执行环境下会是**空值**（`$env:LOCALAPPDATA` 却正常），
+> 所以脚本里一律改用 `[Environment]::GetFolderPath()` 取目录，它走 Shell API 不受影响。
+> 另外 `.ps1` 要写中文必须存成 **UTF-8 带 BOM**，否则 PowerShell 5.1 按 ANSI 读会乱码
+> 甚至报语法错误。
+
+> 安装器未做代码签名，首次运行会被 SmartScreen 拦（点「更多信息 → 仍要运行」）。
 
 ---
 
@@ -137,6 +206,14 @@ Win10 RS5+ / Win11）。
 ### 6. 数据库
 
 全库零 `sqflite`，数据层是 Hive + `path_provider`，Windows 原生可用，无需改动。
+（但数据落盘位置有问题，见第七节第 2 条。）
+
+### 7. exe 元信息
+
+`windows/runner/Runner.rc` 原本还是 Flutter 模板占位值（`CompanyName = org.cc`、
+`ProductName = celechron`、`FileDescription = celechron`）。已对齐为
+`Celechron` / `Celechron - 课程表与学业助手`，翻译代码页从 1252 改成 1200(Unicode)
+以支持中文。模板里本来就有 `#pragma code_page(65001)`，所以 `.rc` 写中文不会乱码。
 
 ---
 
@@ -285,30 +362,29 @@ pub 包全走国内镜像，实测 0.7MB/s。GitHub 只在 git 依赖那一步�
 
 ---
 
-## 七、尚未完成 / 未验证
+## 七、尚未完成 / 已知限制
 
-1. **运行时未实测。** 编译全绿，但没有真正启动过。请跑一次：
+1. **代码签名未做。** 程序和安装器都没签名，首次运行会被 SmartScreen 拦。
+   正式分发需要代码签名证书（约 ¥1000~3000/年）。
 
-   ```bash
-   ./tool/run.sh
-   ```
+2. **应用数据落在「文档」根目录。** `Hive.initFlutter()` 在桌面端解析到
+   `getApplicationDocumentsDirectory()`，即 `C:\Users\<用户>\Documents\`，
+   于是 7 个 `.hive` 文件直接摊在文档根目录下。Android/iOS 上这个目录是应用私有的，
+   原作者不必在意；Windows 上就显得脏。
+   **建议改法**：改用 `getApplicationSupportDirectory()`
+   （`%APPDATA%\Celechron\Celechron`）并做一次性迁移。
+   本次没动 —— 它会移动你已经产生的数据文件，属于需要你确认的改动。
 
-   重点看三处（都是我改动过的启动路径）：通知初始化是否报错、
-   深度链接兜底是否生效、宽窗口下左侧导航栏是否正常。
+3. **后台刷新在桌面端是应用内定时器。** 应用没运行就不会刷新，成绩推送 /
+   DDL 提醒只在程序开着时生效。移动端是系统级调度，语义不同，属平台能力差异。
 
-2. **`jni` 出现在 Windows 的 FFI 插件列表里。** 它来自 `path_provider_android`
-   的传递依赖，但自身声明了 `windows: ffiPlugin: true`，于是被注册进 Windows。
-   本机有 JDK，所以 `dartjni.dll` 正常编出来了；没有 JDK 时它的 CMake 是
-   `find_package(JNI)`（不带 `REQUIRED`），会优雅跳过，不会拖垮编译。
+4. **`jni` 被注册进 Windows 的 FFI 插件列表。** 来自 `path_provider_android`
+   的传递依赖，但自身声明了 `windows: ffiPlugin: true`。本机有 JDK，所以
+   `dartjni.dll` 正常编出；没有 JDK 时 `find_package(JNI)` 不带 `REQUIRED`，
+   会优雅跳过，不影响构建。
 
-3. **`celechron://` 自定义协议未注册。** 付款码快捷方式在 Windows 上不可用，
-   需要安装器写注册表才能启用。
-
-4. **安装包与代码签名未做。** 目前只能出免安装的 exe 目录。
-   不签名的话首次运行会被 SmartScreen 拦。
-
-5. **后台刷新在桌面端是应用内定时器。** 应用没运行就不会刷新 ——
-   这与移动端的系统级调度语义不同，属于平台能力差异，无法规避。
-
-6. **窗口标题栏/任务栏图标**沿用模板默认值，`Runner.rc` 里的
-   CompanyName / FileDescription 还是 `org.cc` / `celechron`，可后续对齐。
+5. **验证覆盖偏薄。** 只做了启动 / 登录 / 布局 / 后台让行的冒烟验证。
+   以下三条改动过的路径没有被真正触发，需要覆盖到具体场景才能确认：
+   - 通知实际弹出（插件 17 → 22 的 API 变更）
+   - iCal 导出的系统分享面板（`share_plus` 的 Windows 实现）
+   - `celechron://ecardpaypage` 深链跳转（协议已注册，但未验证跳转）
