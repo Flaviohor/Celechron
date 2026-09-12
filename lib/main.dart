@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:celechron/services/notification_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -225,30 +225,9 @@ class _CelechronAppState extends State<CelechronApp>
     brightnessMode.refresh();
   }
 
+  /// 通知初始化。各平台的初始化设置集中在 NotificationService 里，
+  /// Windows 需要 Toast 的 appUserModelId / guid，之前这里只配了移动端。
   void _initNotification() {
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
-    const initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestNotificationsPermission();
-    const initializationSettingsDarwin = DarwinInitializationSettings(
-      requestSoundPermission: true,
-      requestBadgePermission: true,
-      requestAlertPermission: true,
-    );
-    // const initializationSettingsWindows = WindowsInitializationSettings(
-    //     appName: 'Celechron',
-    //     appUserModelId: 'top.celechron.app',
-    //     guid: '7c85e25b-fa7d-489e-9b10-b4c22a3458f0');
-    const initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsDarwin,
-      macOS: initializationSettingsDarwin,
-      // windows: initializationSettingsWindows);
-    );
-    flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    unawaited(NotificationService.requestPermission());
   }
 }
