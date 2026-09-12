@@ -1,7 +1,0 @@
-EXE=C:\Users\Flavio\AppData\Local\Programs\Celechron\Celechron.exe
-EXISTS=True
-WMI_RETURN=0 PID=31044
-T=3s MEM=129.4MB HWND=4786248 RESP=True PATH=C:\Users\Flavio\AppData\Local\Programs\Celechron\Celechron.exe
-T=12s MEM=130.9MB HWND=4786248 RESP=True PATH=C:\Users\Flavio\AppData\Local\Programs\Celechron\Celechron.exe
-T=20s MEM=127.1MB HWND=4786248 RESP=True PATH=C:\Users\Flavio\AppData\Local\Programs\Celechron\Celechron.exe
-INSTALLED_APP_RUNS=True
