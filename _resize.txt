@@ -1,6 +1,0 @@
-﻿ORIG_PHYS=2200x1520
-NARROW_PHYS=1200x1500 (logical 600x750, below 700 breakpoint)
-RESTORED_PHYS=2586x1530
---- Start Menu shortcuts (find the AUMID registration) ---
---- protocol registry (celechron://) ---
-HKCU celechron:// not registered (expected before install)
