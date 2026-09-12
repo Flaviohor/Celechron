@@ -42,8 +42,30 @@ class NotificationService {
       macOS: darwinSettings,
       windows: windowsSettings,
     );
-    await plugin.initialize(settings);
+    await plugin.initialize(settings: settings);
     _initialized = true;
+  }
+
+  /// 发一条通知。
+  ///
+  /// `flutter_local_notifications` 22.x 把 `show()` 由位置参数改成了命名参数
+  /// （`id` / `title` / `body` / `notificationDetails` / `payload`），
+  /// 把调用收敛到这里，插件后续再改 API 也只需要动这一个地方。
+  static Future<void> show({
+    required int id,
+    required String title,
+    required String body,
+    required NotificationDetails details,
+    String? payload,
+  }) async {
+    await ensureInitialized();
+    await plugin.show(
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: details,
+      payload: payload,
+    );
   }
 
   /// 幂等初始化：多处调用只有第一次真正执行。

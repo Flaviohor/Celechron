@@ -150,24 +150,30 @@ class OptionController extends GetxController {
 
   /// calendar_to_system.dart: 系统日历同步相关方法
 
-  /// 桌面端没有可写的系统日历，整块能力不可用。
-  bool get _calendarAvailable => PlatformFeatures.isMobile;
+  /// 系统日历读写依赖 `device_calendar`，该插件只实现了 Android / iOS。
+  /// 桌面端插件未注册，任何调用都会抛 MissingPluginException，所以整块能力
+  /// 直接判定为不可用，UI 侧据此换成 iCal 导出。
+  bool get systemCalendarAvailable => PlatformFeatures.isMobile;
 
   // 日历同步相关getter
   bool get calendarSyncEnabled =>
-      _calendarAvailable && _calendarManager.calendarSyncEnabled;
+      systemCalendarAvailable && _calendarManager.calendarSyncEnabled;
 
   bool get hasCalendarPermission =>
-      _calendarAvailable && _calendarManager.hasCalendarPermission;
+      systemCalendarAvailable && _calendarManager.hasCalendarPermission;
 
-  Future<void> toggleCalendarSync(BuildContext context, bool enabled) =>
-      _calendarManager.toggleCalendarSync(context, enabled);
+  Future<void> toggleCalendarSync(BuildContext context, bool enabled) {
+    if (!systemCalendarAvailable) return Future<void>.value();
+    return _calendarManager.toggleCalendarSync(context, enabled);
+  }
 
-  void showCalendarSyncDialog(BuildContext context) =>
-      _calendarManager.showCalendarSyncDialog(context);
+  void showCalendarSyncDialog(BuildContext context) {
+    if (!systemCalendarAvailable) return;
+    _calendarManager.showCalendarSyncDialog(context);
+  }
 
   Map<String, dynamic> getCalendarSyncStatus() {
-    if (!_calendarAvailable) {
+    if (!systemCalendarAvailable) {
       return {
         'available': false,
         'enabled': false,

@@ -89,6 +89,7 @@ class CelechronApp extends StatefulWidget {
 class _CelechronAppState extends State<CelechronApp>
     with WidgetsBindingObserver {
   Timer? _foregroundLeaseHeartbeat;
+  StreamSubscription<Uri>? _appLinksSubscription;
 
   @override
   void initState() {
@@ -110,6 +111,7 @@ class _CelechronAppState extends State<CelechronApp>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _stopForegroundLease();
+    unawaited(_appLinksSubscription?.cancel());
     super.dispose();
   }
 
@@ -179,15 +181,44 @@ class _CelechronAppState extends State<CelechronApp>
         ));
   }
 
+  /// 监听 `celechron://` 深度链接，用于跳转付款码页面。
+  ///
+  /// Windows 上这套机制依赖安装器把自定义协议写进注册表
+  /// （`HKCU\Software\Classes\celechron`）；未注册时不会有任何事件进来，
+  /// 属于功能不可用而非错误。但插件在初始化阶段可能抛异常，而这里跑在
+  /// `initState` 里，异常会直接让首帧渲染失败，所以整体兜住并记入诊断日志。
   void _initAppLinks() {
-    final appLinks = AppLinks();
-    appLinks.uriLinkStream.listen((uri) {
-      if (uri.toString() == 'celechron://ecardpaypage') {
-        navigator?.popUntil((route) =>
-            !(route.settings.name?.endsWith('ecardpaypage') ?? false));
-        navigator?.pushNamed('/ecardpaypage');
-      }
-    });
+    try {
+      final appLinks = AppLinks();
+      _appLinksSubscription = appLinks.uriLinkStream.listen(
+        (uri) {
+          if (uri.toString() == 'celechron://ecardpaypage') {
+            navigator?.popUntil((route) =>
+                !(route.settings.name?.endsWith('ecardpaypage') ?? false));
+            navigator?.pushNamed('/ecardpaypage');
+          }
+        },
+        onError: (Object error, StackTrace stackTrace) {
+          DiagnosticLogService.instance.record(
+            level: CelechronLogLevel.warning,
+            module: 'appLinks',
+            operation: 'listen',
+            message: '深度链接监听中断，付款码快捷方式不可用',
+            error: error,
+            stackTrace: stackTrace,
+          );
+        },
+      );
+    } on Object catch (error, stackTrace) {
+      DiagnosticLogService.instance.record(
+        level: CelechronLogLevel.warning,
+        module: 'appLinks',
+        operation: 'init',
+        message: '当前平台未能初始化深度链接（自定义协议未注册）',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
   }
 
   void _initStatusBar() {

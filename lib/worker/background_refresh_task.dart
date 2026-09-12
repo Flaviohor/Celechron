@@ -73,20 +73,24 @@ Future<void> refreshScholar({bool yieldToForeground = true}) async {
     // 成绩变动通知
     if (pushOnGradeChange != 'false' && !failed('成绩')) {
       if (pushOnGradeChangeFuse == null) {
-        await NotificationService.plugin.show(
-            0,
-            '首次成绩推送',
-            '若有新出分的课程，Celechron 将会通知您。若不需要此功能，可在 Celechron 的设置页面中关闭。',
-            NotificationService.gradeChangeDetails);
+        await NotificationService.show(
+          id: 0,
+          title: '首次成绩推送',
+          body: '若有新出分的课程，Celechron 将会通知您。若不需要此功能，可在 Celechron 的设置页面中关闭。',
+          details: NotificationService.gradeChangeDetails,
+        );
         await secureStorage.write(
             key: 'pushOnGradeChangeFuse',
             value: '1',
             iOptions: secureStorageIOSOptions);
       } else if (scholar.gpa[0] != double.tryParse(oldGpa) ||
           scholar.gradedCourseCount != int.tryParse(gradedCourseCount)) {
-        await NotificationService.plugin.show(0, '成绩变动提醒',
-            '有新出分的课程，可在 Celechron 的学业页面中刷新查看。',
-            NotificationService.gradeChangeDetails);
+        await NotificationService.show(
+          id: 0,
+          title: '成绩变动提醒',
+          body: '有新出分的课程，可在 Celechron 的学业页面中刷新查看。',
+          details: NotificationService.gradeChangeDetails,
+        );
       }
       await secureStorage.write(
           key: 'gpa',
@@ -124,11 +128,12 @@ Future<void> refreshScholar({bool yieldToForeground = true}) async {
         for (var todo in upcomingTodos) {
           var hoursLeft = todo.endTime!.difference(now).inHours;
           var timeDesc = hoursLeft > 0 ? '$hoursLeft 小时后' : '即将';
-          await NotificationService.plugin.show(
-              notificationId++,
-              '作业截止提醒',
-              '「${todo.course}」的作业「${todo.name}」将于$timeDesc截止',
-              NotificationService.ddlReminderDetails);
+          await NotificationService.show(
+            id: notificationId++,
+            title: '作业截止提醒',
+            body: '「${todo.course}」的作业「${todo.name}」将于$timeDesc截止',
+            details: NotificationService.ddlReminderDetails,
+          );
           notifiedDdlIds.add(todo.id);
         }
       }
