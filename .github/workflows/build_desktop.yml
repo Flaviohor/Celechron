@@ -35,6 +35,36 @@ jobs:
           path: build/windows/x64/runner/Release/
           if-no-files-found: error
 
+  build-windows-arm64:
+    name: "Windows arm64"
+    runs-on: windows-11-arm
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+          architecture: arm64
+
+      - name: Enable Windows Desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Windows arm64
+        run: flutter build windows --release
+
+      - name: Upload Windows arm64 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: celechron-windows-arm64
+          path: build/windows/arm64/runner/Release/
+          if-no-files-found: error
+
   build-windows-x86:
     name: "Windows x86"
     runs-on: windows-latest
