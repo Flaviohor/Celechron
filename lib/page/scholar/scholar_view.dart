@@ -90,44 +90,52 @@ Future<void> showRefreshResultDialog(
   );
 }
 
+/// 学业页出错时的兜底界面。
+///
+/// 它被注册成了全局的 `ErrorWidget.builder`，也就是**任何** widget 构建失败都会
+/// 渲染成它，出现位置既可能是盒子槽位也可能是 sliver 槽位。因此这里返回盒子组件
+/// （与 Flutter 自带 ErrorWidget 的约定一致）：早期实现返回 SliverList，一旦错误
+/// 发生在盒子槽位（例如 SliverToBoxAdapter 里的 Obx），就会紧接着抛出二次布局
+/// 异常，把一次构建错误放大成持续的异常风暴——界面卡死、CPU 空转、进程随后退出。
 class ScholarErrorHandler extends StatelessWidget {
-  final FlutterErrorDetails errorDetails;
-  final _scholarController = Get.put(ScholarController());
-
   ScholarErrorHandler({
     super.key,
     required this.errorDetails,
   });
 
+  final FlutterErrorDetails errorDetails;
+
+  /// 兜底界面里不要再创建控制器：错误渲染阶段调用 Get.put 会替换掉已注册实例，
+  /// 使页面持有的引用与全局注册表不一致，更容易连环出错。
+  ScholarController? get _scholarController =>
+      Get.isRegistered<ScholarController>() ? Get.find<ScholarController>() : null;
+
   @override
   Widget build(BuildContext context) {
-    return SliverList(
-      delegate: SliverChildListDelegate([
-        CupertinoListSection.insetGrouped(
-          header: Container(
-            padding: const EdgeInsets.only(left: 16, right: 16),
-            child: Text(
-              '获取数据时遇到问题。请检查网络连接情况，并尝试重新获取数据。\n注意：你需要完成所有的教学评价才能获取成绩信息。',
-              style: TextStyle(
-                  color: CupertinoDynamicColor.resolve(
-                      CupertinoColors.secondaryLabel, context),
-                  fontSize: 14),
-            ),
-          ),
-          children: [
-            CupertinoButton(
-              onPressed: () async {
-                final results = await _scholarController.fetchData();
-                if (context.mounted &&
-                    results.any((result) => result != null)) {
-                  await showRefreshResultDialog(context, results);
-                }
-              },
-              child: const Text('重新获取数据'),
-            ),
-          ],
+    return CupertinoListSection.insetGrouped(
+      header: Container(
+        padding: const EdgeInsets.only(left: 16, right: 16),
+        child: Text(
+          '获取数据时遇到问题。请检查网络连接情况，并尝试重新获取数据。\n注意：你需要完成所有的教学评价才能获取成绩信息。',
+          style: TextStyle(
+              color: CupertinoDynamicColor.resolve(
+                  CupertinoColors.secondaryLabel, context),
+              fontSize: 14),
         ),
-      ]),
+      ),
+      children: [
+        CupertinoButton(
+          onPressed: () async {
+            final controller = _scholarController;
+            if (controller == null) return;
+            final results = await controller.fetchData();
+            if (context.mounted && results.any((result) => result != null)) {
+              await showRefreshResultDialog(context, results);
+            }
+          },
+          child: const Text('重新获取数据'),
+        ),
+      ],
     );
   }
 }

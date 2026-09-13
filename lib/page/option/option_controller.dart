@@ -156,11 +156,17 @@ class OptionController extends GetxController {
   bool get systemCalendarAvailable => PlatformFeatures.isMobile;
 
   // 日历同步相关getter
+  //
+  // 注意操作数顺序不能反：把内部 RxBool 放在 && 左边。桌面端
+  // systemCalendarAvailable 恒为 false，一旦把它写在前面对 RxBool 的读取就会被
+  // 短路掉——依赖这两个 getter 的 Obx（设置页「日程」区块）会一个依赖都建立不
+  // 起来，GetX 判定为 improper use 直接抛异常；而那个 Obx 处在 sliver 槽位，
+  // 抛错后错误占位组件被塞进 sliver 槽位会引发连锁布局异常，界面卡死直至进程退出。
   bool get calendarSyncEnabled =>
-      systemCalendarAvailable && _calendarManager.calendarSyncEnabled;
+      _calendarManager.calendarSyncEnabled && systemCalendarAvailable;
 
   bool get hasCalendarPermission =>
-      systemCalendarAvailable && _calendarManager.hasCalendarPermission;
+      _calendarManager.hasCalendarPermission && systemCalendarAvailable;
 
   Future<void> toggleCalendarSync(BuildContext context, bool enabled) {
     if (!systemCalendarAvailable) return Future<void>.value();

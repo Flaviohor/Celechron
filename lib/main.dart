@@ -10,6 +10,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:app_links/app_links.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:celechron/model/scholar.dart';
 import 'package:celechron/model/option.dart';
@@ -30,6 +31,9 @@ void main() async {
 
   // 初始化数据库
   await Hive.initFlutter();
+  // Windows 上若上次进程被强杀，Hive 留下的 .lock 0 字节文件会卡住下一次的
+  // openBox（mmap 锁未释放，errno=33）。这里清掉陈旧锁文件。
+  await _purgeStaleHiveLocks();
   var db = Get.put(DatabaseHelper(), tag: 'db');
   await db.init();
 
@@ -56,6 +60,28 @@ void main() async {
     );
   } else {
     unawaited(ECardWidgetMessenger.update());
+  }
+}
+
+Future<void> _purgeStaleHiveLocks() async {
+  try {
+    final dir = Directory(await _hiveRootPath());
+    if (!dir.existsSync()) return;
+    for (final ent in dir.listSync(followLinks: false)) {
+      if (ent is! File) continue;
+      if (!ent.path.endsWith('.lock')) continue;
+      try {
+        ent.deleteSync();
+      } on Object catch (_) {/* 仍被占用就不动，让 Hive 自行报错 */}
+    }
+  } on Object catch (_) {/* 失败也无所谓，开不了就让它正常报错 */}
+}
+
+Future<String> _hiveRootPath() async {
+  try {
+    return (await getApplicationDocumentsDirectory()).path;
+  } on Object catch (_) {
+    return Directory.systemTemp.path;
   }
 }
 

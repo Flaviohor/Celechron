@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 import 'package:celechron/utils/utils.dart';
 import 'package:celechron/model/option.dart';
 import 'package:celechron/design/cupertino_async_switch.dart';
+import 'package:celechron/design/glass.dart';
 
 import 'allow_time_edit_page.dart';
 import 'course_id_mapping_edit_page.dart';
@@ -50,18 +51,18 @@ class OptionPage extends StatelessWidget {
                 CupertinoDynamicColor.resolve(_kHeaderFooterColor, context)));
 
     return CupertinoPageScaffold(
-        backgroundColor: CupertinoColors.systemGroupedBackground,
+        backgroundColor: const Color(0x00000000),
         child: SafeArea(
             child: CustomScrollView(
           slivers: [
             const CupertinoSliverNavigationBar(
               largeTitle: Text('设置'),
-              backgroundColor: CupertinoColors.systemGroupedBackground,
+              backgroundColor: Color(0x00000000),
               border: null,
             ),
             // 教务
             Obx(() => SliverToBoxAdapter(
-                  child: CupertinoListSection.insetGrouped(
+                  child: GlassCard(child: CupertinoListSection.insetGrouped(backgroundColor: Color(0x00000000),
                     margin: _defaultMargin,
                     additionalDividerMargin: 2,
                     header: Container(
@@ -203,10 +204,10 @@ class OptionPage extends StatelessWidget {
                       },
                     ],
                   ),
-                )),
+                ))),
             // 时间规划
             SliverToBoxAdapter(
-                child: CupertinoListSection.insetGrouped(
+                child: GlassCard(child: CupertinoListSection.insetGrouped(backgroundColor: Color(0x00000000),
                     additionalDividerMargin: 2,
                     margin: _defaultMargin,
                     header: Container(
@@ -326,10 +327,10 @@ class OptionPage extends StatelessWidget {
                       ));
                     },
                   ),
-                ])),
+                ]))),
             // 日程
             Obx(() => SliverToBoxAdapter(
-                    child: CupertinoListSection.insetGrouped(
+                    child: GlassCard(child: CupertinoListSection.insetGrouped(backgroundColor: Color(0x00000000),
                         additionalDividerMargin: 2,
                         margin: _defaultMargin,
                         header: Container(
@@ -403,10 +404,10 @@ class OptionPage extends StatelessWidget {
                         onTap: () =>
                             _optionController.showExportDialog(context),
                       ),
-                    ]))),
+                    ])))),
             // 工具
             SliverToBoxAdapter(
-                child: CupertinoListSection.insetGrouped(
+                child: GlassCard(child: CupertinoListSection.insetGrouped(backgroundColor: Color(0x00000000),
                     additionalDividerMargin: 2,
                     margin: _defaultMargin,
                     header: Container(
@@ -436,10 +437,10 @@ class OptionPage extends StatelessWidget {
                           .pushNamed('/ecardpaypage');
                     },
                   ),
-                ])),
+                ]))),
             // 关于
             SliverToBoxAdapter(
-              child: CupertinoListSection.insetGrouped(
+              child: GlassCard(child: CupertinoListSection.insetGrouped(backgroundColor: Color(0x00000000),
                 additionalDividerMargin: 2,
                 margin: _defaultMargin,
                 header: Container(
@@ -463,10 +464,10 @@ class OptionPage extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
+            )),
             // 关于
             SliverToBoxAdapter(
-              child: CupertinoListSection.insetGrouped(
+              child: GlassCard(child: CupertinoListSection.insetGrouped(backgroundColor: Color(0x00000000),
                   additionalDividerMargin: 2,
                   margin: _defaultMargin,
                   header: Container(
@@ -526,7 +527,7 @@ class OptionPage extends StatelessWidget {
                       },
                     ),
                   ]),
-            )
+            ))
           ],
         )));
   }

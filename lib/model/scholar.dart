@@ -39,7 +39,16 @@ class Scholar {
   String? password;
   Spider? _spider;
 
-  bool get isGrs => !username!.startsWith('3');
+  /// 是否研究生（学号不是以 3 开头）。
+  ///
+  /// 学号来自系统安全存储，可能在「有离线缓存但凭据缺失」时读到 null（例如缓存
+  /// 文件还在、凭据库被清空的机器）。这个 getter 会在学业页构建期间被调用，
+  /// 因此绝不能抛空断言——取不到学号时按本科界面展示，这是最常见也最安全的默认值。
+  bool get isGrs {
+    final name = username;
+    if (name == null || name.isEmpty) return false;
+    return !name.startsWith('3');
+  }
 
   // 按学期整理好的学业信息，包括该学期的所有科目、考试、课表、均绩等
   List<Semester> semesters = <Semester>[];
