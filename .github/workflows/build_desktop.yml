@@ -56,6 +56,8 @@ jobs:
         run: flutter pub get
 
       - name: Build Windows arm64
+        env:
+          FLUTTER_HOST_ARCH: arm64
         run: flutter build windows --release
 
       - name: Upload Windows arm64 artifacts
