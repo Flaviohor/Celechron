@@ -14,11 +14,8 @@ jobs:
       matrix:
         include:
           - arch: x64
-            cmake_arch: x64
           - arch: arm64
-            cmake_arch: ARM64
           - arch: x86
-            cmake_arch: Win32
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -35,29 +32,52 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build Windows (${{ matrix.arch }})
+      - name: Build Windows x64
+        if: matrix.arch == 'x64'
+        run: flutter build windows --release
+
+      - name: Build Windows arm64
+        if: matrix.arch == 'arm64'
         shell: pwsh
         run: |
-          if (Test-Path "build\windows") { Remove-Item -Recurse -Force "build\windows" }
+          # Run flutter build once to set up ephemeral files
+          flutter build windows --release
 
-          $generator = "Visual Studio 17 2022"
-          $buildDir = "build\windows\${{ matrix.arch }}"
+          # Reconfigure for ARM64 and rebuild
+          $buildDir = "build\windows\x64"
+          $arm64Dir = "build\windows\arm64"
+          New-Item -ItemType Directory -Force -Path $arm64Dir | Out-Null
 
-          New-Item -ItemType Directory -Force -Path $buildDir | Out-Null
+          # Copy ephemeral files
+          Copy-Item -Recurse "windows\flutter\ephemeral" "$arm64Dir\flutter\ephemeral"
 
-          cmake -G $generator `
-            -A ${{ matrix.cmake_arch }} `
-            -S windows `
-            -B $buildDir `
-            -DFLUTTER_TARGET="lib\main.dart"
+          # Find VS installation
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vsPath = & $vswhere -latest -products * -property installationPath
 
-          cmake --build $buildDir --config Release
+          # Use MSBuild to rebuild for ARM64
+          $msbuild = Join-Path $vsPath "MSBuild\Current\Bin\MSBuild.exe"
+          & $msbuild "$buildDir\runner\celechron.sln" /p:Configuration=Release /p:Platform=ARM64 /t:Rebuild
+
+      - name: Build Windows x86
+        if: matrix.arch == 'x86'
+        shell: pwsh
+        run: |
+          # Run flutter build once to set up ephemeral files
+          flutter build windows --release
+
+          # Use MSBuild to rebuild for x86
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vsPath = & $vswhere -latest -products * -property installationPath
+
+          $msbuild = Join-Path $vsPath "MSBuild\Current\Bin\MSBuild.exe"
+          & $msbuild "build\windows\x64\runner\celechron.sln" /p:Configuration=Release /p:Platform=Win32 /t:Rebuild
 
       - name: Upload Windows ${{ matrix.arch }} artifacts
         uses: actions/upload-artifact@v4
         with:
           name: celechron-windows-${{ matrix.arch }}
-          path: build/windows/${{ matrix.arch }}/runner/Release/
+          path: build/windows/*/runner/Release/
           if-no-files-found: error
 
   build-macos:
@@ -96,7 +116,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ninja-build libgtk-3-dev
+          sudo apt-get install -y ninja-build libgtk-3-dev libsecret-1-dev
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2

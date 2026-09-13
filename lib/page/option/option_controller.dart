@@ -192,7 +192,7 @@ class OptionController extends GetxController {
           macOS: initializationSettingsDarwin,
           windows: initializationSettingsWindows,
           linux: initializationSettingsLinux);
-      await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+      await flutterLocalNotificationsPlugin.initialize(settings: initializationSettings);
       await _ensureBackgroundWorkerScheduled();
     } on Object catch (error, stackTrace) {
       DiagnosticLogService.instance.record(

@@ -252,6 +252,6 @@ class _CelechronAppState extends State<CelechronApp>
       windows: initializationSettingsWindows,
       linux: initializationSettingsLinux,
     );
-    flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    flutterLocalNotificationsPlugin.initialize(settings: initializationSettings);
   }
 }
