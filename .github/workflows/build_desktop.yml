@@ -6,16 +6,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-windows:
-    name: "Windows ${{ matrix.arch }}"
+  build-windows-x64:
+    name: "Windows x64"
     runs-on: windows-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - arch: x64
-          - arch: arm64
-          - arch: x86
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -33,51 +26,88 @@ jobs:
         run: flutter pub get
 
       - name: Build Windows x64
-        if: matrix.arch == 'x64'
         run: flutter build windows --release
 
+      - name: Upload Windows x64 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: celechron-windows-x64
+          path: build/windows/x64/runner/Release/
+          if-no-files-found: error
+
+  build-windows-arm64:
+    name: "Windows arm64"
+    runs-on: windows-arm64
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Enable Windows Desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Install dependencies
+        run: flutter pub get
+
       - name: Build Windows arm64
-        if: matrix.arch == 'arm64'
+        run: flutter build windows --release
+
+      - name: Upload Windows arm64 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: celechron-windows-arm64
+          path: build/windows/arm64/runner/Release/
+          if-no-files-found: error
+
+  build-windows-x86:
+    name: "Windows x86"
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Enable Windows Desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Windows x86
         shell: pwsh
         run: |
-          # Run flutter build once to set up ephemeral files
+          # flutter build windows builds for host arch (x64).
+          # For x86, we need to manually run cmake with Win32 platform.
+          # First, run flutter build to generate ephemeral files
           flutter build windows --release
-
-          # Reconfigure for ARM64 and rebuild
-          $buildDir = "build\windows\x64"
-          $arm64Dir = "build\windows\arm64"
-          New-Item -ItemType Directory -Force -Path $arm64Dir | Out-Null
-
-          # Copy ephemeral files
-          Copy-Item -Recurse "windows\flutter\ephemeral" "$arm64Dir\flutter\ephemeral"
 
           # Find VS installation
           $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
           $vsPath = & $vswhere -latest -products * -property installationPath
+          $cmakePath = Join-Path $vsPath "Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe"
 
-          # Use MSBuild to rebuild for ARM64
-          $msbuild = Join-Path $vsPath "MSBuild\Current\Bin\MSBuild.exe"
-          & $msbuild "$buildDir\runner\celechron.sln" /p:Configuration=Release /p:Platform=ARM64 /t:Rebuild
+          # Reconfigure cmake for Win32
+          $buildDir = "build\windows\x64"
+          & $cmakePath -G "Visual Studio 17 2022" -A Win32 -S windows -B "$buildDir" -DFLUTTER_TARGET="lib\main.dart"
 
-      - name: Build Windows x86
-        if: matrix.arch == 'x86'
-        shell: pwsh
-        run: |
-          # Run flutter build once to set up ephemeral files
-          flutter build windows --release
+          # Rebuild
+          & $cmakePath --build "$buildDir" --config Release
 
-          # Use MSBuild to rebuild for x86
-          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-          $vsPath = & $vswhere -latest -products * -property installationPath
-
-          $msbuild = Join-Path $vsPath "MSBuild\Current\Bin\MSBuild.exe"
-          & $msbuild "build\windows\x64\runner\celechron.sln" /p:Configuration=Release /p:Platform=Win32 /t:Rebuild
-
-      - name: Upload Windows ${{ matrix.arch }} artifacts
+      - name: Upload Windows x86 artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: celechron-windows-${{ matrix.arch }}
-          path: build/windows/*/runner/Release/
+          name: celechron-windows-x86
+          path: build/windows/x64/runner/Release/
           if-no-files-found: error
 
   build-macos:
