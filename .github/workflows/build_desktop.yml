@@ -49,14 +49,38 @@ jobs:
           cache: true
           architecture: x64
 
+      - name: Switch Flutter to native Windows ARM64 Dart SDK
+        shell: pwsh
+        run: |
+          # The Flutter SDK x64 distribution comes with an x64 Dart SDK.
+          # When running on Windows 11 ARM64 under emulation, Dart VM's Abi.current() returns Abi.windowsX64,
+          # causing Flutter to target windows-x64 instead of windows-arm64!
+          # Replacing the embedded Dart SDK with native ARM64 Dart SDK makes Abi.current() return Abi.windowsArm64.
+          $dartVersion = (Get-Content "$env:FLUTTER_ROOT\bin\cache\dart-sdk\revision").Trim()
+          Write-Host "Downloading native Windows ARM64 Dart SDK for version: $dartVersion"
+          $zipPath = "$env:TEMP\dartsdk-windows-arm64.zip"
+          Invoke-WebRequest -Uri "https://storage.googleapis.com/dart-archive/channels/stable/release/$dartVersion/sdk/dartsdk-windows-arm64-release.zip" -OutFile $zipPath
+          
+          # Replace bin\cache\dart-sdk with arm64 version
+          Remove-Item -Recurse -Force "$env:FLUTTER_ROOT\bin\cache\dart-sdk"
+          Expand-Archive -Path $zipPath -DestinationPath "$env:FLUTTER_ROOT\bin\cache"
+          Remove-Item -Force $zipPath
+          
+          # Delete flutter_tools snapshot so it recompiles with arm64 Dart
+          Remove-Item -Force "$env:FLUTTER_ROOT\bin\cache\flutter_tools.snapshot" -ErrorAction SilentlyContinue
+          Remove-Item -Force "$env:FLUTTER_ROOT\bin\cache\flutter_tools.stamp" -ErrorAction SilentlyContinue
+
       - name: Enable Windows Desktop
         run: flutter config --enable-windows-desktop
+
+      - name: Precache Windows ARM64 engine artifacts
+        run: flutter precache --windows
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build Windows arm64
-        run: flutter build windows --release -v
+        run: flutter build windows --release
 
       - name: Upload Windows arm64 artifacts
         uses: actions/upload-artifact@v4
