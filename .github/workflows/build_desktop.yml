@@ -1,0 +1,118 @@
+name: Build Desktop Apps
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    name: "Windows ${{ matrix.arch }}"
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            cmake_arch: x64
+          - arch: arm64
+            cmake_arch: ARM64
+          - arch: x86
+            cmake_arch: Win32
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Enable Windows Desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Windows (${{ matrix.arch }})
+        shell: pwsh
+        run: |
+          if (Test-Path "build\windows") { Remove-Item -Recurse -Force "build\windows" }
+
+          $generator = "Visual Studio 17 2022"
+          $buildDir = "build\windows\${{ matrix.arch }}"
+
+          New-Item -ItemType Directory -Force -Path $buildDir | Out-Null
+
+          cmake -G $generator `
+            -A ${{ matrix.cmake_arch }} `
+            -S windows `
+            -B $buildDir `
+            -DFLUTTER_TARGET="lib\main.dart"
+
+          cmake --build $buildDir --config Release
+
+      - name: Upload Windows ${{ matrix.arch }} artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: celechron-windows-${{ matrix.arch }}
+          path: build/windows/${{ matrix.arch }}/runner/Release/
+          if-no-files-found: error
+
+  build-macos:
+    name: "macOS"
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build macOS
+        run: flutter build macos --release
+
+      - name: Upload macOS artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: celechron-macos
+          path: build/macos/Build/Products/Release/
+          if-no-files-found: error
+
+  build-linux:
+    name: "Linux"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libgtk-3-dev
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Build Linux
+        run: flutter build linux --release
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: celechron-linux-x64
+          path: build/linux/x64/release/bundle/
+          if-no-files-found: error

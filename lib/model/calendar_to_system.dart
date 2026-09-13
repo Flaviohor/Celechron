@@ -31,7 +31,12 @@ class CalendarToSystemManager {
   static const String celechronCalendarName = 'Celechron课表';
   static const String calendarDescription = '由Celechron自动同步的浙大课程表';
 
-  final DeviceCalendarPlugin _deviceCalendarPlugin = DeviceCalendarPlugin();
+  // device_calendar only supports Android and iOS
+  static bool get _isSupported => Platform.isAndroid || Platform.isIOS;
+
+  DeviceCalendarPlugin? _calendarPluginInstance;
+  DeviceCalendarPlugin get _calendarPlugin =>
+      _calendarPluginInstance ??= DeviceCalendarPlugin();
 
   // 缓存已同步的事件ID，避免重复添加
   final Set<String> _syncedEventIds = <String>{};
@@ -56,13 +61,12 @@ class CalendarToSystemManager {
 
   /// 获取设备日历权限
   Future<bool> checkPermissions() async {
-    // device_calendar plugin doesn't support macOS
-    if (Platform.isMacOS) {
+    if (!_isSupported) {
       _hasCalendarPermission.value = false;
       return false;
     }
     try {
-      var permissionsGranted = await _deviceCalendarPlugin.hasPermissions();
+      var permissionsGranted = await _calendarPlugin.hasPermissions();
       if (permissionsGranted.isSuccess && permissionsGranted.data!) {
         _hasCalendarPermission.value = true;
         return true;
@@ -78,19 +82,18 @@ class CalendarToSystemManager {
 
   /// 获取设备日历权限
   Future<bool> requestPermissions() async {
-    // device_calendar plugin doesn't support macOS
-    if (Platform.isMacOS) {
+    if (!_isSupported) {
       _hasCalendarPermission.value = false;
       return false;
     }
     try {
-      var permissionsGranted = await _deviceCalendarPlugin.hasPermissions();
+      var permissionsGranted = await _calendarPlugin.hasPermissions();
       if (permissionsGranted.isSuccess && permissionsGranted.data!) {
         _hasCalendarPermission.value = true;
         return true;
       } else {
         var permissionsRequested =
-            await _deviceCalendarPlugin.requestPermissions();
+            await _calendarPlugin.requestPermissions();
         _hasCalendarPermission.value =
             permissionsRequested.isSuccess && permissionsRequested.data!;
         return _hasCalendarPermission.value;
@@ -106,7 +109,7 @@ class CalendarToSystemManager {
     try {
       // 如果已有缓存的日历ID，先验证是否仍然存在
       if (_celechronCalendarId != null) {
-        var calendarsResult = await _deviceCalendarPlugin.retrieveCalendars();
+        var calendarsResult = await _calendarPlugin.retrieveCalendars();
         if (calendarsResult.isSuccess) {
           var existingCalendar = calendarsResult.data!
               .firstWhereOrNull((cal) => cal.id == _celechronCalendarId);
@@ -117,7 +120,7 @@ class CalendarToSystemManager {
       }
 
       // 查找是否已存在同名日历
-      var calendarsResult = await _deviceCalendarPlugin.retrieveCalendars();
+      var calendarsResult = await _calendarPlugin.retrieveCalendars();
       if (calendarsResult.isSuccess) {
         var existingCalendar = calendarsResult.data!
             .firstWhereOrNull((cal) => cal.name == celechronCalendarName);
@@ -130,7 +133,7 @@ class CalendarToSystemManager {
 
       // 创建新的Celechron日历
       var createResult =
-          await _deviceCalendarPlugin.createCalendar(celechronCalendarName);
+          await _calendarPlugin.createCalendar(celechronCalendarName);
       if (createResult.isSuccess && createResult.data != null) {
         _celechronCalendarId = createResult.data;
         return _celechronCalendarId;
@@ -204,7 +207,7 @@ class CalendarToSystemManager {
 
           // 添加到系统日历
           var createResult =
-              await _deviceCalendarPlugin.createOrUpdateEvent(event);
+              await _calendarPlugin.createOrUpdateEvent(event);
 
           if (createResult != null && createResult.isSuccess) {
             _syncedEventIds.add(eventId);
@@ -283,7 +286,7 @@ class CalendarToSystemManager {
       }
 
       // 获取日历中的所有事件
-      var eventsResult = await _deviceCalendarPlugin.retrieveEvents(
+      var eventsResult = await _calendarPlugin.retrieveEvents(
         _celechronCalendarId!,
         RetrieveEventsParams(
           startDate: DateTime.now().subtract(const Duration(days: 365)),
@@ -295,7 +298,7 @@ class CalendarToSystemManager {
         var events = eventsResult.data ?? [];
         for (var event in events) {
           try {
-            await _deviceCalendarPlugin.deleteEvent(
+            await _calendarPlugin.deleteEvent(
               _celechronCalendarId!,
               event.eventId!,
             );
@@ -332,7 +335,7 @@ class CalendarToSystemManager {
     try {
       // 如果没有缓存的日历ID，先尝试查找
       if (_celechronCalendarId == null) {
-        var calendarsResult = await _deviceCalendarPlugin.retrieveCalendars();
+        var calendarsResult = await _calendarPlugin.retrieveCalendars();
         if (calendarsResult.isSuccess) {
           var existingCalendar = calendarsResult.data!
               .firstWhereOrNull((cal) => cal.name == celechronCalendarName);
@@ -349,7 +352,7 @@ class CalendarToSystemManager {
 
       // 删除整个日历
       var deleteResult =
-          await _deviceCalendarPlugin.deleteCalendar(_celechronCalendarId!);
+          await _calendarPlugin.deleteCalendar(_celechronCalendarId!);
 
       if (deleteResult.isSuccess && deleteResult.data!) {
         // 清空所有缓存信息
@@ -489,6 +492,10 @@ class CalendarToSystemManager {
 
   /// 显示日历同步选项对话框
   void showCalendarSyncDialog(BuildContext context) {
+    if (!_isSupported) {
+      _showAlert(context, '暂不支持', '当前平台暂不支持日历同步功能');
+      return;
+    }
     showCupertinoModalPopup(
       context: context,
       builder: (BuildContext actionSheetContext) {
@@ -562,8 +569,7 @@ class CalendarToSystemManager {
 
   /// 检查初始日历同步状态
   Future<void> checkInitialCalendarSyncStatus() async {
-    // device_calendar plugin doesn't support macOS
-    if (Platform.isMacOS) {
+    if (!_isSupported) {
       _calendarSyncEnabled.value = false;
       _hasCalendarPermission.value = false;
       return;
@@ -578,7 +584,7 @@ class CalendarToSystemManager {
         return;
       }
 
-      var calendarsResult = await _deviceCalendarPlugin.retrieveCalendars();
+      var calendarsResult = await _calendarPlugin.retrieveCalendars();
       if (calendarsResult.isSuccess) {
         var existingCalendar = calendarsResult.data!
             .firstWhereOrNull((cal) => cal.name == celechronCalendarName);
@@ -586,7 +592,7 @@ class CalendarToSystemManager {
         if (existingCalendar != null) {
           // 如果找到了Celechron日历，说明之前可能开启过同步
           // 但为了保险起见，我们检查日历中是否有事件
-          var eventsResult = await _deviceCalendarPlugin.retrieveEvents(
+          var eventsResult = await _calendarPlugin.retrieveEvents(
             existingCalendar.id!,
             RetrieveEventsParams(
               startDate: DateTime.now().subtract(const Duration(days: 30)),
@@ -608,9 +614,8 @@ class CalendarToSystemManager {
 
   /// 切换日历同步功能
   Future<void> toggleCalendarSync(BuildContext context, bool enabled) async {
-    // macOS 暂不支持系统日历同步功能
-    if (Platform.isMacOS) {
-      _showAlert(context, '暂不支持', 'macOS 系统暂不支持日历同步功能');
+    if (!_isSupported) {
+      _showAlert(context, '暂不支持', '当前平台暂不支持日历同步功能');
       return;
     }
 

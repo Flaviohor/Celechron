@@ -180,9 +180,18 @@ class OptionController extends GetxController {
         requestBadgePermission: true,
         requestAlertPermission: true,
       );
+      const initializationSettingsWindows = WindowsInitializationSettings(
+          appName: 'Celechron',
+          appUserModelId: 'top.celechron.app',
+          guid: '7c85e25b-fa7d-489e-9b10-b4c22a3458f0');
+      const initializationSettingsLinux =
+          LinuxInitializationSettings(defaultActionName: 'Open Celechron');
       const initializationSettings = InitializationSettings(
           android: initializationSettingsAndroid,
-          iOS: initializationSettingsDarwin);
+          iOS: initializationSettingsDarwin,
+          macOS: initializationSettingsDarwin,
+          windows: initializationSettingsWindows,
+          linux: initializationSettingsLinux);
       await flutterLocalNotificationsPlugin.initialize(initializationSettings);
       await _ensureBackgroundWorkerScheduled();
     } on Object catch (error, stackTrace) {
