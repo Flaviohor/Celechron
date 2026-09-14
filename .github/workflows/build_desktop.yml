@@ -256,6 +256,11 @@ jobs:
       - name: Build macOS
         run: flutter build macos --release
 
+      - name: Sign macOS app (ad-hoc)
+        run: |
+          APP_PATH="build/macos/Build/Products/Release/Celechron.app"
+          codesign --force --deep --sign - "$APP_PATH"
+
       - name: Create DMG
         run: |
           brew install create-dmg
