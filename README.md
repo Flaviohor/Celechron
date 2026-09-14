@@ -19,8 +19,7 @@
 
 ## 致谢
 
-本仓库是 [Celechron/Celechron](https://github.com/Celechron/Celechron) 的 Windows 桌面端分支，
-Android / iOS 版本的全部实现来自上游。**没有上游就没有这个项目**，在此向上游的每一位原作者与贡献者致谢。
+本仓库是 [Celechron/Celechron](https://github.com/Celechron/Celechron) 的 Windows 桌面端分支，目前还有很多bug，非常简陋。**没有上游就没有这个项目**，在此向上游的每一位原作者与贡献者致谢。
 
 **开发**
 
