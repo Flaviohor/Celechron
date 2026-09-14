@@ -1,3 +1,0 @@
-APPDATA=[]
-GetFolderPath(Programs)=[C:\Users\Flavio\AppData\Roaming\Microsoft\Windows\Start Menu\Programs]
-Celechron not running

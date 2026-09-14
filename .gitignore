@@ -880,6 +880,15 @@ DerivedData/
 !default.perspectivev3
 
 
+### 本地开发临时文件（Windows 端调试中间产物）
+
+# 根目录下所有以 _ 开头的文件/目录：构建日志（_build.*）、PowerShell 探针脚本
+# （_diag*.ps1 / _cap*.ps1）、界面截图（_*shot*.png）、运行时输出（_*.out/_*.err）等。
+# 这些都是排查过程中的一次性产物，不入库。历史上误提交过几个，已从索引移除；
+# 若确有需要长期保留的诊断结论，请写进 WINDOWS_PORT.md 或文档目录。
+/_*
+
+
 ### Flutter Generated Exceptions
 
 # Exceptions to above rules.

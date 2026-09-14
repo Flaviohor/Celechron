@@ -1,16 +1,67 @@
-; Celechron Windows x64 安装器脚本（Inno Setup 6）
+; Celechron Windows 安装器脚本（Inno Setup 6）
 ;
-; 打包来源复用 tool/package.py 生成的暂存目录，保证安装版与便携版内容完全一致
-; （包含 app-local 部署的 VC++ 运行时，目标机器无需另装运行库）。
+; 一份脚本同时服务本地与 CI，差异全部走命令行 /D 覆盖。
 ;
-; 编译：ISCC.exe tool\installer.iss
+; 本地（默认，从 flutter build 产物取文件）：
+;   ISCC.exe tool\installer.iss
+;
+; 本地（推荐：从 tool/package.py 生成的暂存目录取文件，包内已含 app-local
+; VC++ 运行库，目标机器无需另装运行库）：
+;   ISCC.exe /DStageDir=E:\celechron-windows\dist\Celechron-1.3.0-windows-x64 tool\installer.iss
+;
+; CI（.github/workflows/build_desktop.yml 调用）：
+;   ISCC.exe /DAppVersion=<pubspec 版本> /DArchLabel=x64 /DBuildDir=x64 ^
+;            /DSourceRoot=<github.workspace> tool\installer.iss
+;
+; 可覆盖开关：AppVersion / ArchLabel / BuildDir / SourceRoot / StageDir / OutputDir
+; 产物统一落在 {#OutputDir}（默认 installer_output\），文件名
+;   Celechron-<版本>-windows-<架构>-setup.exe
 
-#define AppName        "Celechron"
-#define AppVersion     "1.3.0"
-#define AppPublisher   "Celechron contributors"
-#define AppURL         "https://github.com/Celechron/Celechron"
-#define AppExeName     "Celechron.exe"
-#define StageDir       "E:\celechron-windows\dist\Celechron-1.3.0-windows-x64"
+#define AppName      "Celechron"
+#define AppExeName   "Celechron.exe"
+#define AppPublisher "Celechron contributors"
+#define AppURL       "https://github.com/Celechron/Celechron"
+
+; ---- 开关默认值：命令行给了就用命令行的（#ifndef 只在未定义时生效）----
+
+#ifndef AppVersion
+  #define AppVersion "1.3.0"
+#endif
+
+#ifndef ArchLabel
+  #define ArchLabel "x64"
+#endif
+
+#ifndef BuildDir
+  #define BuildDir "x64"
+#endif
+
+#ifndef SourceRoot
+  ; 本机仓库根目录。CI 通过 /DSourceRoot=${{ github.workspace }} 覆盖，
+  ; 所以这里写绝对路径不影响流水线；换机器开发时改这一行即可。
+  #define SourceRoot "E:\celechron-windows"
+#endif
+
+#ifndef StageDir
+  ; 待打包的程序目录：flutter build 的 runner\Release，或含 VC++ 运行库的暂存目录
+  #define StageDir SourceRoot + "\build\windows\" + BuildDir + "\runner\Release"
+#endif
+
+#ifndef OutputDir
+  #define OutputDir SourceRoot + "\installer_output"
+#endif
+
+; ---- 按目标架构推导 Inno 的架构开关 ----
+
+#if ArchLabel == "x64"
+  #define ArchAllowed "x64compatible"
+#elif ArchLabel == "arm64"
+  #define ArchAllowed "arm64compatible"
+#elif ArchLabel == "x86"
+  #define ArchAllowed "x86compatible"
+#else
+  #error ArchLabel 只支持 x64 / arm64 / x86，当前值无法识别
+#endif
 
 [Setup]
 AppId={{8F1C4E52-3B7A-4D19-9E64-2A7C5B0D83F1}
@@ -26,17 +77,19 @@ DefaultGroupName={#AppName}
 DisableProgramGroupPage=yes
 UninstallDisplayName={#AppName} {#AppVersion}
 UninstallDisplayIcon={app}\{#AppExeName}
-OutputDir=E:\celechron-windows\dist
-OutputBaseFilename={#AppName}-{#AppVersion}-windows-x64-setup
-SetupIconFile=E:\celechron-windows\windows\runner\resources\app_icon.ico
+OutputDir={#OutputDir}
+OutputBaseFilename={#AppName}-{#AppVersion}-windows-{#ArchLabel}-setup
+SetupIconFile={#SourceRoot}\windows\runner\resources\app_icon.ico
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
 ; 默认按用户安装（不弹 UAC）；也允许用户在向导里改为全机器安装
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
-ArchitecturesAllowed=x64compatible
-ArchitecturesInstallIn64BitMode=x64compatible
+ArchitecturesAllowed={#ArchAllowed}
+#if ArchLabel != "x86"
+ArchitecturesInstallIn64BitMode={#ArchAllowed}
+#endif
 MinVersion=10.0.17763
 CloseApplications=yes
 RestartApplications=no
