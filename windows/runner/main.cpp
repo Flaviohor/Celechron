@@ -24,10 +24,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
 
   project.set_dart_entrypoint_arguments(std::move(command_line_arguments));
 
+  // Windows 上的 Impeller（OpenGL ES）后端仍是实验特性：实测长时间运行后
+  // 光栅线程会卡死——窗口无响应、内容区整块空白、CPU 空转，最终进程被系统
+  // 回收。这里显式回退到成熟的 Skia 后端，稳定优先。
+  project.set_impeller_switch(flutter::ImpellerSwitch::Disabled);
+
   FlutterWindow window(project);
   Win32Window::Point origin(10, 10);
-  Win32Window::Size size(1280, 720);
-  if (!window.Create(L"celechron", origin, size)) {
+  // 桌面端按窗口尺寸给出默认值：宽屏时 HomePage 会切换到左侧导航栏布局，
+  // 因此初始尺寸留成横向而不是手机竖屏比例。
+  Win32Window::Size size(1100, 760);
+  if (!window.Create(L"Celechron", origin, size)) {
     return EXIT_FAILURE;
   }
   window.SetQuitOnClose(true);

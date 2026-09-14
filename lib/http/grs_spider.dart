@@ -434,7 +434,7 @@ class GrsSpider implements Spider {
           if (value.item1.toString().contains("验证码")) {
             cancelTimetableFetch = true;
           }
-          return Future.value(value.item1?.toString());
+          return value.item1?.toString();
         } on Object catch (error, stackTrace) {
           return Future.value(
               _describeRefreshFailure(error, stackTrace, source: '课表'));

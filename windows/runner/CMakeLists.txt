@@ -30,6 +30,12 @@ target_compile_definitions(${BINARY_NAME} PRIVATE "FLUTTER_VERSION_BUILD=${FLUTT
 # Disable Windows macros that collide with C++ standard library functions.
 target_compile_definitions(${BINARY_NAME} PRIVATE "NOMINMAX")
 
+# 源码里含中文注释，而 MSVC 在中文区域（代码页 936）下默认按 GBK 解码源文件，
+# 碰到 UTF-8 字节会报 C4819「该文件包含不能在当前代码页中表示的字符」；
+# runner 又开了 /WX（警告即错误），于是直接编译失败。
+# 显式声明源码编码即可，与开发机的系统区域设置无关。
+target_compile_options(${BINARY_NAME} PRIVATE "/utf-8")
+
 # Add dependency libraries and include directories. Add any application-specific
 # dependencies here.
 target_link_libraries(${BINARY_NAME} PRIVATE flutter flutter_wrapper_app)

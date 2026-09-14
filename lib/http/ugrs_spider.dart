@@ -521,7 +521,7 @@ class UgrsSpider implements Spider {
           if (isProbeYear && value.item1 != null) {
             probeHadUnexpectedFailure = true;
           }
-          return Future.value(value.item1?.toString());
+          return value.item1?.toString();
         } on Object catch (error, stackTrace) {
           if (isProbeYear && isExpectedTimetableProbeMiss(error)) {
             return null;

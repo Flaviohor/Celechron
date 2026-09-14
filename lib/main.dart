@@ -5,11 +5,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:celechron/services/notification_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:app_links/app_links.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:celechron/model/scholar.dart';
 import 'package:celechron/model/option.dart';
@@ -30,6 +31,9 @@ void main() async {
 
   // 初始化数据库
   await Hive.initFlutter();
+  // Windows 上若上次进程被强杀，Hive 留下的 .lock 0 字节文件会卡住下一次的
+  // openBox（mmap 锁未释放，errno=33）。这里清掉陈旧锁文件。
+  await _purgeStaleHiveLocks();
   var db = Get.put(DatabaseHelper(), tag: 'db');
   await db.init();
 
@@ -56,6 +60,28 @@ void main() async {
     );
   } else {
     unawaited(ECardWidgetMessenger.update());
+  }
+}
+
+Future<void> _purgeStaleHiveLocks() async {
+  try {
+    final dir = Directory(await _hiveRootPath());
+    if (!dir.existsSync()) return;
+    for (final ent in dir.listSync(followLinks: false)) {
+      if (ent is! File) continue;
+      if (!ent.path.endsWith('.lock')) continue;
+      try {
+        ent.deleteSync();
+      } on Object catch (_) {/* 仍被占用就不动，让 Hive 自行报错 */}
+    }
+  } on Object catch (_) {/* 失败也无所谓，开不了就让它正常报错 */}
+}
+
+Future<String> _hiveRootPath() async {
+  try {
+    return (await getApplicationDocumentsDirectory()).path;
+  } on Object catch (_) {
+    return Directory.systemTemp.path;
   }
 }
 
@@ -89,6 +115,7 @@ class CelechronApp extends StatefulWidget {
 class _CelechronAppState extends State<CelechronApp>
     with WidgetsBindingObserver {
   Timer? _foregroundLeaseHeartbeat;
+  StreamSubscription<Uri>? _appLinksSubscription;
 
   @override
   void initState() {
@@ -110,6 +137,7 @@ class _CelechronAppState extends State<CelechronApp>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _stopForegroundLease();
+    unawaited(_appLinksSubscription?.cancel());
     super.dispose();
   }
 
@@ -179,15 +207,44 @@ class _CelechronAppState extends State<CelechronApp>
         ));
   }
 
+  /// 监听 `celechron://` 深度链接，用于跳转付款码页面。
+  ///
+  /// Windows 上这套机制依赖安装器把自定义协议写进注册表
+  /// （`HKCU\Software\Classes\celechron`）；未注册时不会有任何事件进来，
+  /// 属于功能不可用而非错误。但插件在初始化阶段可能抛异常，而这里跑在
+  /// `initState` 里，异常会直接让首帧渲染失败，所以整体兜住并记入诊断日志。
   void _initAppLinks() {
-    final appLinks = AppLinks();
-    appLinks.uriLinkStream.listen((uri) {
-      if (uri.toString() == 'celechron://ecardpaypage') {
-        navigator?.popUntil((route) =>
-            !(route.settings.name?.endsWith('ecardpaypage') ?? false));
-        navigator?.pushNamed('/ecardpaypage');
-      }
-    });
+    try {
+      final appLinks = AppLinks();
+      _appLinksSubscription = appLinks.uriLinkStream.listen(
+        (uri) {
+          if (uri.toString() == 'celechron://ecardpaypage') {
+            navigator?.popUntil((route) =>
+                !(route.settings.name?.endsWith('ecardpaypage') ?? false));
+            navigator?.pushNamed('/ecardpaypage');
+          }
+        },
+        onError: (Object error, StackTrace stackTrace) {
+          DiagnosticLogService.instance.record(
+            level: CelechronLogLevel.warning,
+            module: 'appLinks',
+            operation: 'listen',
+            message: '深度链接监听中断，付款码快捷方式不可用',
+            error: error,
+            stackTrace: stackTrace,
+          );
+        },
+      );
+    } on Object catch (error, stackTrace) {
+      DiagnosticLogService.instance.record(
+        level: CelechronLogLevel.warning,
+        module: 'appLinks',
+        operation: 'init',
+        message: '当前平台未能初始化深度链接（自定义协议未注册）',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
   }
 
   void _initStatusBar() {
@@ -225,33 +282,9 @@ class _CelechronAppState extends State<CelechronApp>
     brightnessMode.refresh();
   }
 
+  /// 通知初始化。各平台的初始化设置集中在 NotificationService 里，
+  /// Windows 需要 Toast 的 appUserModelId / guid，之前这里只配了移动端。
   void _initNotification() {
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        FlutterLocalNotificationsPlugin();
-    const initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestNotificationsPermission();
-    const initializationSettingsDarwin = DarwinInitializationSettings(
-      requestSoundPermission: true,
-      requestBadgePermission: true,
-      requestAlertPermission: true,
-    );
-    const initializationSettingsWindows = WindowsInitializationSettings(
-        appName: 'Celechron',
-        appUserModelId: 'top.celechron.app',
-        guid: '7c85e25b-fa7d-489e-9b10-b4c22a3458f0');
-    const initializationSettingsLinux =
-        LinuxInitializationSettings(defaultActionName: 'Open Celechron');
-    const initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsDarwin,
-      macOS: initializationSettingsDarwin,
-      windows: initializationSettingsWindows,
-      linux: initializationSettingsLinux,
-    );
-    flutterLocalNotificationsPlugin.initialize(settings: initializationSettings);
+    unawaited(NotificationService.requestPermission());
   }
 }

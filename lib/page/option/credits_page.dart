@@ -12,7 +12,14 @@ class CreditsPage extends StatefulWidget {
 }
 
 class _CreditsPageState extends State<CreditsPage> {
-  List<String> _contributors = [];
+  /// 本分支（Windows 桌面端）的维护者，不随网络变化
+  static const List<String> maintainers = ['Kepler16f', 'Flaviohor'];
+
+  /// 上游的设计人员，随致谢一并保留
+  static const List<String> designers = ['nosig', '空之探险队的 Kate'];
+
+  /// 上游开发人员，优先取自 GitHub 接口，失败时退回默认名单
+  List<String> _upstreamContributors = [];
   bool _isLoading = true;
   final _githubService = GitHubService();
   final _httpClient = HttpClient();
@@ -20,23 +27,23 @@ class _CreditsPageState extends State<CreditsPage> {
   @override
   void initState() {
     super.initState();
-    _loadContributors();
+    _loadUpstreamContributors();
   }
 
-  Future<void> _loadContributors() async {
+  Future<void> _loadUpstreamContributors() async {
     try {
       var result = await _githubService.getContributors(_httpClient);
       // 无论是否有错误，都使用返回的 contributors 列表
       // GitHubService 保证即使出错也会返回默认作者名单
       setState(() {
-        _contributors = result.item2;
+        _upstreamContributors = result.item2;
         _isLoading = false;
       });
     } catch (e) {
       // 如果 GitHubService 本身抛出异常
       // 则使用 GitHubService 中的默认名单
       setState(() {
-        _contributors = GitHubService.defaultContributors;
+        _upstreamContributors = GitHubService.defaultContributors;
         _isLoading = false;
       });
     }
@@ -48,43 +55,26 @@ class _CreditsPageState extends State<CreditsPage> {
     super.dispose();
   }
 
-  Widget _buildContributorsList() {
-    if (_isLoading) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 16),
-        child: CupertinoActivityIndicator(),
-      );
-    }
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32),
-      child: Column(
-        children: _buildContributorRows(),
-      ),
-    );
-  }
-
-  List<Widget> _buildContributorRows() {
+  /// 每行两人，行间留白；奇数个时末行只占左半
+  Widget _buildNameGrid(List<String> names) {
     List<Widget> rows = [];
-    for (int i = 0; i < _contributors.length; i += 2) {
+    for (int i = 0; i < names.length; i += 2) {
       List<Widget> children = [];
 
-      // 第一个contributor
       children.add(
         Expanded(
           child: Text(
-            _contributors[i],
+            names[i],
             textAlign: TextAlign.center,
           ),
         ),
       );
 
-      // 如果有第二个contributor，添加它
-      if (i + 1 < _contributors.length) {
+      if (i + 1 < names.length) {
         children.add(
           Expanded(
             child: Text(
-              _contributors[i + 1],
+              names[i + 1],
               textAlign: TextAlign.center,
             ),
           ),
@@ -101,13 +91,60 @@ class _CreditsPageState extends State<CreditsPage> {
         ),
       );
 
-      // 如果不是最后一行，添加间距
-      if (i + 2 < _contributors.length) {
+      if (i + 2 < names.length) {
         rows.add(const SizedBox(height: 12));
       }
     }
 
-    return rows;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32),
+      child: Column(
+        children: rows,
+      ),
+    );
+  }
+
+  /// 上游名单依赖网络，加载中显示菊花
+  Widget _buildUpstreamGrid() {
+    if (_isLoading) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 16),
+        child: CupertinoActivityIndicator(),
+      );
+    }
+    return _buildNameGrid(_upstreamContributors);
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Column(
+      children: [
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  Widget _buildGroupHeader(String title) {
+    return Column(
+      children: [
+        Text(
+          title,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
   }
 
   @override
@@ -157,66 +194,19 @@ class _CreditsPageState extends State<CreditsPage> {
                   const SizedBox(
                     height: 24,
                   ),
-                  const Text(
-                    '制作人员',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
+                  _buildSectionHeader('制作人员'),
+                  _buildNameGrid(maintainers),
+                  const SizedBox(
+                    height: 32,
                   ),
+                  _buildSectionHeader('上游制作人员'),
+                  _buildGroupHeader('🧑‍💻开发'),
+                  _buildUpstreamGrid(),
                   const SizedBox(
                     height: 24,
                   ),
-                  const Text(
-                    '🎨设计',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 16,
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 32),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      mainAxisSize: MainAxisSize.max,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      verticalDirection: VerticalDirection.down,
-                      children: <Widget>[
-                        Expanded(
-                          child: Text(
-                            'nosig',
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Expanded(
-                          child: Text(
-                            '空之探险队的 Kate',
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 24,
-                  ),
-                  const Text(
-                    '🧑‍💻开发',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 16,
-                  ),
-                  _buildContributorsList(),
+                  _buildGroupHeader('🎨设计'),
+                  _buildNameGrid(designers),
                 ],
               ),
             ),

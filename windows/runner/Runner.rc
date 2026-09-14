@@ -89,8 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
+            // 注意：CompanyName / ProductName 不只是展示用的元数据。
+            // flutter_secure_storage 与 path_provider 在 Windows 上都用
+            //   %APPDATA%\<CompanyName>\<ProductName>
+            // 作为数据目录，改这两个字符串会让**已保存的登录凭据和缓存全部"失踪"**
+            // （表现为每次启动都要重新登录）。这里必须保持上游原值。
             VALUE "CompanyName", "org.cc" "\0"
-            VALUE "FileDescription", "celechron" "\0"
+            VALUE "FileDescription", "Celechron - 课程表与学业助手" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "celechron" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 org.cc. All rights reserved." "\0"
@@ -101,7 +106,7 @@ BEGIN
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x409, 1252
+        VALUE "Translation", 0x409, 1200
     END
 END
 
