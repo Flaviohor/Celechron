@@ -1,0 +1,300 @@
+name: Build Desktop Apps
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  APP_VERSION: "1.0.0"
+
+jobs:
+  build-windows-x64:
+    name: "Windows x64"
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Enable Windows Desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Windows x64
+        run: flutter build windows --release
+
+      - name: Build Installer
+        shell: pwsh
+        run: |
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          & $iscc "/DAppVersion=${{ env.APP_VERSION }}" "/DArchLabel=x64" "/DBuildDir=x64" "/DSourceRoot=${{ github.workspace }}" "windows\installer\Celechron.iss"
+
+      - name: Upload Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: celechron-windows-x64-installer
+          path: installer_output/celechron-*.exe
+          if-no-files-found: error
+
+  build-windows-arm64:
+    name: "Windows arm64"
+    runs-on: windows-11-arm
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+          architecture: x64
+
+      - name: Switch Flutter to native Windows ARM64 Dart SDK
+        shell: pwsh
+        run: |
+          $versionFile = "$env:FLUTTER_ROOT\bin\cache\dart-sdk\version"
+          $dartSemver = (Get-Content $versionFile).Trim().Split(" ")[0]
+          Write-Host "Downloading native Windows ARM64 Dart SDK for version: $dartSemver"
+          $zipPath = "$env:TEMP\dartsdk-windows-arm64.zip"
+          Invoke-WebRequest -Uri "https://storage.googleapis.com/dart-archive/channels/stable/release/$dartSemver/sdk/dartsdk-windows-arm64-release.zip" -OutFile $zipPath
+          
+          Remove-Item -Recurse -Force "$env:FLUTTER_ROOT\bin\cache\dart-sdk"
+          Expand-Archive -Path $zipPath -DestinationPath "$env:FLUTTER_ROOT\bin\cache"
+          Remove-Item -Force $zipPath
+          
+          Remove-Item -Force "$env:FLUTTER_ROOT\bin\cache\flutter_tools.snapshot" -ErrorAction SilentlyContinue
+          Remove-Item -Force "$env:FLUTTER_ROOT\bin\cache\flutter_tools.stamp" -ErrorAction SilentlyContinue
+
+      - name: Enable Windows Desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Precache Windows ARM64 engine artifacts
+        run: flutter precache --windows
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Windows arm64
+        run: flutter build windows --release
+
+      - name: Build Installer
+        shell: pwsh
+        run: |
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          & $iscc "/DAppVersion=${{ env.APP_VERSION }}" "/DArchLabel=arm64" "/DBuildDir=arm64" "/DSourceRoot=${{ github.workspace }}" "windows\installer\Celechron.iss"
+
+      - name: Upload Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: celechron-windows-arm64-installer
+          path: installer_output/celechron-*.exe
+          if-no-files-found: error
+
+  build-windows-x86:
+    name: "Windows x86"
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Enable Windows Desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Windows x86
+        shell: pwsh
+        run: |
+          flutter build windows --release
+
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vsPath = & $vswhere -latest -products * -property installationPath
+          $cmakePath = Join-Path $vsPath "Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe"
+
+          $buildDir = "build\windows\x64"
+          & $cmakePath -G "Visual Studio 17 2022" -A Win32 -S windows -B "$buildDir" -DFLUTTER_TARGET="lib\main.dart"
+          & $cmakePath --build "$buildDir" --config Release
+
+      - name: Build Installer
+        shell: pwsh
+        run: |
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          & $iscc "/DAppVersion=${{ env.APP_VERSION }}" "/DArchLabel=x86" "/DBuildDir=x64" "/DSourceRoot=${{ github.workspace }}" "windows\installer\Celechron.iss"
+
+      - name: Upload Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: celechron-windows-x86-installer
+          path: installer_output/celechron-*.exe
+          if-no-files-found: error
+
+  build-macos:
+    name: "macOS"
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build macOS
+        run: flutter build macos --release
+
+      - name: Create DMG
+        run: |
+          brew install create-dmg
+          create-dmg \
+            --volname "Celechron" \
+            --window-pos 200 120 \
+            --window-size 800 400 \
+            --icon-size 100 \
+            --icon "Celechron.app" 200 190 \
+            --hide-extension "Celechron.app" \
+            --app-drop-link 600 190 \
+            "celechron-${{ env.APP_VERSION }}-macos.dmg" \
+            "build/macos/Build/Products/Release/Celechron.app"
+
+      - name: Upload DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: celechron-macos-installer
+          path: celechron-*-macos.dmg
+          if-no-files-found: error
+
+  build-linux-x64:
+    name: "Linux x64"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libgtk-3-dev libsecret-1-dev
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Build Linux
+        run: flutter build linux --release
+
+      - name: Create DEB package
+        run: |
+          DEB_DIR="celechron_${{ env.APP_VERSION }}_amd64"
+          mkdir -p "$DEB_DIR/DEBIAN"
+          mkdir -p "$DEB_DIR/opt/celechron"
+          mkdir -p "$DEB_DIR/usr/bin"
+          mkdir -p "$DEB_DIR/usr/share/applications"
+          mkdir -p "$DEB_DIR/usr/share/icons/hicolor/256x256/apps"
+
+          cat > "$DEB_DIR/DEBIAN/control" << EOF
+          Package: celechron
+          Version: ${{ env.APP_VERSION }}
+          Architecture: amd64
+          Maintainer: nosig
+          Description: Celechron - A calendar scheduling assistant
+          EOF
+
+          cp -r build/linux/x64/release/bundle/* "$DEB_DIR/opt/celechron/"
+          ln -s /opt/celechron/celechron "$DEB_DIR/usr/bin/celechron"
+
+          cp assets/logo.png "$DEB_DIR/usr/share/icons/hicolor/256x256/apps/celechron.png" 2>/dev/null || true
+
+          cat > "$DEB_DIR/usr/share/applications/celechron.desktop" << EOF
+          [Desktop Entry]
+          Name=Celechron
+          Exec=celechron
+          Icon=celechron
+          Type=Application
+          Categories=Utility;Calendar;
+          EOF
+
+          dpkg-deb --build "$DEB_DIR"
+
+      - name: Upload DEB
+        uses: actions/upload-artifact@v4
+        with:
+          name: celechron-linux-x64-installer
+          path: celechron_*.deb
+          if-no-files-found: error
+
+  build-linux-arm64:
+    name: "Linux arm64"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
+      - name: Build Linux arm64 in Docker
+        run: |
+          docker run --rm --platform linux/arm64 \
+            -v "${{ github.workspace }}:/app" \
+            -w /app \
+            arm64v8/ubuntu:22.04 \
+            bash -c "
+              apt-get update && \
+              apt-get install -y curl git unzip xz-utils zip ninja-build \
+                libgtk-3-dev libsecret-1-dev clang cmake pkg-config \
+                liblzma-dev libstdc++-12-dev dpkg-dev && \
+              rm -rf /var/lib/apt/lists/* && \
+              git clone --depth 1 --branch stable https://github.com/flutter/flutter.git /opt/flutter && \
+              export PATH=/opt/flutter/bin:/opt/flutter/bin/cache/dart-sdk/bin:\$PATH && \
+              flutter precache --linux && \
+              flutter config --enable-linux-desktop && \
+              flutter pub get && \
+              flutter build linux --release && \
+              DEB_DIR=celechron_${{ env.APP_VERSION }}_arm64 && \
+              mkdir -p \$DEB_DIR/DEBIAN && \
+              mkdir -p \$DEB_DIR/opt/celechron && \
+              mkdir -p \$DEB_DIR/usr/bin && \
+              mkdir -p \$DEB_DIR/usr/share/applications && \
+              mkdir -p \$DEB_DIR/usr/share/icons/hicolor/256x256/apps && \
+              printf 'Package: celechron\nVersion: ${{ env.APP_VERSION }}\nArchitecture: arm64\nMaintainer: nosig\nDescription: Celechron - A calendar scheduling assistant\n' > \$DEB_DIR/DEBIAN/control && \
+              cp -r build/linux/arm64/release/bundle/* \$DEB_DIR/opt/celechron/ && \
+              ln -s /opt/celechron/celechron \$DEB_DIR/usr/bin/celechron && \
+              cp assets/logo.png \$DEB_DIR/usr/share/icons/hicolor/256x256/apps/celechron.png 2>/dev/null || true && \
+              printf '[Desktop Entry]\nName=Celechron\nExec=celechron\nIcon=celechron\nType=Application\nCategories=Utility;Calendar;\n' > \$DEB_DIR/usr/share/applications/celechron.desktop && \
+              dpkg-deb --build \$DEB_DIR
+            "
+
+      - name: Upload DEB
+        uses: actions/upload-artifact@v4
+        with:
+          name: celechron-linux-arm64-installer
+          path: celechron_*.deb
+          if-no-files-found: error
