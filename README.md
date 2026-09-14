@@ -14,8 +14,8 @@
 
 本项目当前由以下两位维护：
 
-- [Flaviohor](https://github.com/Flaviohor)
-- [Kepler16f](https://github.com/Kepler16f)
+- [Flaviohor](https://github.com/Flaviohor)(x86 and x64 开发)
+- [Kepler16f](https://github.com/Kepler16f)(arm 开发)
 
 
 ## 致谢
