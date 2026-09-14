@@ -14,8 +14,9 @@
 
 本项目当前由以下两位维护：
 
-- [Kepler16f](https://github.com/Kepler16f)
 - [Flaviohor](https://github.com/Flaviohor)
+- [Kepler16f](https://github.com/Kepler16f)
+
 
 ## 致谢
 
