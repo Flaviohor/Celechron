@@ -101,7 +101,11 @@ AllowNoIcons=yes
 SetupLogging=yes
 
 [Languages]
-Name: "chinesesimplified"; MessagesFile: "compiler:Languages\ChineseSimplified.isl"
+; 中文语言包随仓库提供（tool\languages\ChineseSimplified.isl）。
+; 不要用 "compiler:Languages\ChineseSimplified.isl" —— Inno Setup 只内置英文，
+; 中文包属于"用户贡献翻译"，官方安装包里没有，runner 上因此报
+; "Couldn't open include file"。随仓库走就不依赖打包机的安装内容了。
+Name: "chinesesimplified"; MessagesFile: "{#SourceRoot}\tool\languages\ChineseSimplified.isl"
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
