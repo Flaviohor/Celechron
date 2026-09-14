@@ -59,7 +59,10 @@
   #define ArchAllowed "x64compatible"
   #define Arch64Mode  "x64"
 #elif ArchLabel == "arm64"
-  #define ArchAllowed "arm64compatible"
+  ; 注意：不存在 "arm64compatible" 这个标识符（ISCC 会报
+  ; Architecture identifier "arm64compatible" is invalid），
+  ; x64compatible 才是合法的。arm64 用精确值。
+  #define ArchAllowed "arm64"
   #define Arch64Mode  "arm64"
 #elif ArchLabel == "x86"
   #define ArchAllowed "x86compatible"
