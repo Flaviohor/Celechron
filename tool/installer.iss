@@ -169,7 +169,8 @@ begin
   if CurUninstallStep = usUninstall then
   begin
     if not GetRemoveData() then Exit;
-    ; 记录选择，供 unins000 之后使用
+    // 注意：[Code] 段是 Pascal 代码，注释只能用 // 或 { }，
+    // 这里写 ; 会被当成语句开头，报 "Syntax error"。
     Docs := ExpandConstant('{userdocs}');
     SetArrayLength(Names, 7);
     Names[0] := 'dbuser.hive';
