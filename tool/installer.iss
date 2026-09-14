@@ -52,11 +52,15 @@
 #endif
 
 ; ---- 按目标架构推导 Inno 的架构开关 ----
+; ArchAllowed   给 ArchitecturesAllowed（可以用 *compatible 变体）
+; Arch64Mode    给 ArchitecturesInstallIn64BitMode（只接受精确架构名，x86 不用该指令）
 
 #if ArchLabel == "x64"
   #define ArchAllowed "x64compatible"
+  #define Arch64Mode  "x64"
 #elif ArchLabel == "arm64"
   #define ArchAllowed "arm64compatible"
+  #define Arch64Mode  "arm64"
 #elif ArchLabel == "x86"
   #define ArchAllowed "x86compatible"
 #else
@@ -88,7 +92,7 @@ PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 ArchitecturesAllowed={#ArchAllowed}
 #if ArchLabel != "x86"
-ArchitecturesInstallIn64BitMode={#ArchAllowed}
+ArchitecturesInstallIn64BitMode={#Arch64Mode}
 #endif
 MinVersion=10.0.17763
 CloseApplications=yes
