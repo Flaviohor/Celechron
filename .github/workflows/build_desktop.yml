@@ -35,7 +35,7 @@ jobs:
         shell: pwsh
         run: |
           $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
-          & $iscc /DAppVersion="${{ env.APP_VERSION }}" /DDestArch="x64" /DBuildDir="x64" "windows\installer\Celechron.iss"
+          & $iscc "/DAppVersion=${{ env.APP_VERSION }}" "/DArchLabel=x64" "/DBuildDir=x64" "/DSourceRoot=${{ github.workspace }}" "windows\installer\Celechron.iss"
 
       - name: Upload Installer
         uses: actions/upload-artifact@v4
@@ -90,7 +90,7 @@ jobs:
         shell: pwsh
         run: |
           $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
-          & $iscc /DAppVersion="${{ env.APP_VERSION }}" /DDestArch="arm64" /DBuildDir="arm64" "windows\installer\Celechron.iss"
+          & $iscc "/DAppVersion=${{ env.APP_VERSION }}" "/DArchLabel=arm64" "/DBuildDir=arm64" "/DSourceRoot=${{ github.workspace }}" "windows\installer\Celechron.iss"
 
       - name: Upload Installer
         uses: actions/upload-artifact@v4
@@ -135,7 +135,7 @@ jobs:
         shell: pwsh
         run: |
           $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
-          & $iscc /DAppVersion="${{ env.APP_VERSION }}" /DDestArch="x86" /DBuildDir="x64" "windows\installer\Celechron.iss"
+          & $iscc "/DAppVersion=${{ env.APP_VERSION }}" "/DArchLabel=x86" "/DBuildDir=x64" "/DSourceRoot=${{ github.workspace }}" "windows\installer\Celechron.iss"
 
       - name: Upload Installer
         uses: actions/upload-artifact@v4
@@ -213,6 +213,7 @@ jobs:
           DEB_DIR="celechron_${{ env.APP_VERSION }}_amd64"
           mkdir -p "$DEB_DIR/DEBIAN"
           mkdir -p "$DEB_DIR/opt/celechron"
+          mkdir -p "$DEB_DIR/usr/bin"
           mkdir -p "$DEB_DIR/usr/share/applications"
           mkdir -p "$DEB_DIR/usr/share/icons/hicolor/256x256/apps"
 
