@@ -309,8 +309,8 @@ class _SidebarItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = CupertinoTheme.of(context);
     final Color accent = theme.primaryColor;
-    final Color normalColor = CupertinoDynamicColor.resolve(
-        CupertinoColors.systemGrey, context);
+    final Color normalColor =
+        CupertinoDynamicColor.resolve(CupertinoColors.systemGrey, context);
     final Color tint = selected ? accent : normalColor;
     final Widget inner = Padding(
       padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),

@@ -62,7 +62,9 @@ class OptionPage extends StatelessWidget {
             ),
             // 教务
             Obx(() => SliverToBoxAdapter(
-                  child: GlassCard(child: CupertinoListSection.insetGrouped(backgroundColor: Color(0x00000000),
+                    child: GlassCard(
+                  child: CupertinoListSection.insetGrouped(
+                    backgroundColor: Color(0x00000000),
                     margin: _defaultMargin,
                     additionalDividerMargin: 2,
                     header: Container(
@@ -207,13 +209,15 @@ class OptionPage extends StatelessWidget {
                 ))),
             // 时间规划
             SliverToBoxAdapter(
-                child: GlassCard(child: CupertinoListSection.insetGrouped(backgroundColor: Color(0x00000000),
-                    additionalDividerMargin: 2,
-                    margin: _defaultMargin,
-                    header: Container(
-                        padding: const EdgeInsets.only(left: 16),
-                        child: Text('时间规划', style: headerFooterTextStyle)),
-                    children: <CupertinoListTile>[
+                child: GlassCard(
+                    child: CupertinoListSection.insetGrouped(
+                        backgroundColor: Color(0x00000000),
+                        additionalDividerMargin: 2,
+                        margin: _defaultMargin,
+                        header: Container(
+                            padding: const EdgeInsets.only(left: 16),
+                            child: Text('时间规划', style: headerFooterTextStyle)),
+                        children: <CupertinoListTile>[
                   CupertinoListTile(
                     title: const Text('工作段时间长度'),
                     trailing: BackChervonRow(
@@ -330,13 +334,16 @@ class OptionPage extends StatelessWidget {
                 ]))),
             // 日程
             Obx(() => SliverToBoxAdapter(
-                    child: GlassCard(child: CupertinoListSection.insetGrouped(backgroundColor: Color(0x00000000),
-                        additionalDividerMargin: 2,
-                        margin: _defaultMargin,
-                        header: Container(
-                            padding: const EdgeInsets.only(left: 16),
-                            child: Text('日程', style: headerFooterTextStyle)),
-                        children: [
+                    child: GlassCard(
+                        child: CupertinoListSection.insetGrouped(
+                            backgroundColor: Color(0x00000000),
+                            additionalDividerMargin: 2,
+                            margin: _defaultMargin,
+                            header: Container(
+                                padding: const EdgeInsets.only(left: 16),
+                                child:
+                                    Text('日程', style: headerFooterTextStyle)),
+                            children: [
                       // 系统日历读写由 device_calendar 提供，只有 Android / iOS
                       // 有实现。桌面端直接展示为不可用，并引导到 iCal 导出。
                       if (_optionController.systemCalendarAvailable)
@@ -407,13 +414,15 @@ class OptionPage extends StatelessWidget {
                     ])))),
             // 工具
             SliverToBoxAdapter(
-                child: GlassCard(child: CupertinoListSection.insetGrouped(backgroundColor: Color(0x00000000),
-                    additionalDividerMargin: 2,
-                    margin: _defaultMargin,
-                    header: Container(
-                        padding: const EdgeInsets.only(left: 16),
-                        child: Text('工具', style: headerFooterTextStyle)),
-                    children: <Widget>[
+                child: GlassCard(
+                    child: CupertinoListSection.insetGrouped(
+                        backgroundColor: Color(0x00000000),
+                        additionalDividerMargin: 2,
+                        margin: _defaultMargin,
+                        header: Container(
+                            padding: const EdgeInsets.only(left: 16),
+                            child: Text('工具', style: headerFooterTextStyle)),
+                        children: <Widget>[
                   CupertinoListTile(
                     title: const Text('暗色模式'),
                     trailing: BackChervonRow(
@@ -440,7 +449,9 @@ class OptionPage extends StatelessWidget {
                 ]))),
             // 关于
             SliverToBoxAdapter(
-              child: GlassCard(child: CupertinoListSection.insetGrouped(backgroundColor: Color(0x00000000),
+                child: GlassCard(
+              child: CupertinoListSection.insetGrouped(
+                backgroundColor: Color(0x00000000),
                 additionalDividerMargin: 2,
                 margin: _defaultMargin,
                 header: Container(
@@ -467,7 +478,9 @@ class OptionPage extends StatelessWidget {
             )),
             // 关于
             SliverToBoxAdapter(
-              child: GlassCard(child: CupertinoListSection.insetGrouped(backgroundColor: Color(0x00000000),
+                child: GlassCard(
+              child: CupertinoListSection.insetGrouped(
+                  backgroundColor: Color(0x00000000),
                   additionalDividerMargin: 2,
                   margin: _defaultMargin,
                   header: Container(

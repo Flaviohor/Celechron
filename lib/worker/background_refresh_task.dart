@@ -19,8 +19,7 @@ import 'package:celechron/utils/utils.dart';
 /// [yieldToForeground] 为 true 时（移动端 isolate）检测到前台活跃就让行，
 /// 避免和前台刷新重复干活；桌面端定时器跑在应用主进程内，传 false 直接执行。
 Future<void> refreshScholar({bool yieldToForeground = true}) async {
-  if (yieldToForeground &&
-      await RefreshCoordinator.shouldYieldBackground()) {
+  if (yieldToForeground && await RefreshCoordinator.shouldYieldBackground()) {
     DiagnosticLogService.instance.record(
       module: 'refresh',
       operation: 'backgroundYield',
@@ -38,9 +37,9 @@ Future<void> refreshScholar({bool yieldToForeground = true}) async {
       key: 'username', iOptions: secureStorageIOSOptions);
   scholar.password = await secureStorage.read(
       key: 'password', iOptions: secureStorageIOSOptions);
-  var oldGpa = await secureStorage.read(
-          key: 'gpa', iOptions: secureStorageIOSOptions) ??
-      '0.0';
+  var oldGpa =
+      await secureStorage.read(key: 'gpa', iOptions: secureStorageIOSOptions) ??
+          '0.0';
   var gradedCourseCount = await secureStorage.read(
           key: 'gradedCourseCount', iOptions: secureStorageIOSOptions) ??
       '0';
@@ -62,8 +61,7 @@ Future<void> refreshScholar({bool yieldToForeground = true}) async {
     if (backgroundYielded) return;
     // 后台刷新拿到整体降级结果时不发通知，避免把旧缓存误判为新成绩或新作业。
     if (refreshErrors.whereType<String>().any((error) =>
-        isDegradedRefreshText(error) &&
-        shortErrorText(error).contains('刷新'))) {
+        isDegradedRefreshText(error) && shortErrorText(error).contains('刷新'))) {
       return;
     }
     bool failed(String interfaceName) => refreshErrors

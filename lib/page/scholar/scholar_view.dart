@@ -108,7 +108,9 @@ class ScholarErrorHandler extends StatelessWidget {
   /// 兜底界面里不要再创建控制器：错误渲染阶段调用 Get.put 会替换掉已注册实例，
   /// 使页面持有的引用与全局注册表不一致，更容易连环出错。
   ScholarController? get _scholarController =>
-      Get.isRegistered<ScholarController>() ? Get.find<ScholarController>() : null;
+      Get.isRegistered<ScholarController>()
+          ? Get.find<ScholarController>()
+          : null;
 
   @override
   Widget build(BuildContext context) {
