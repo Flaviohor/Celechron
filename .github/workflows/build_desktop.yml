@@ -38,10 +38,10 @@ jobs:
           & $iscc "/DAppVersion=${{ env.APP_VERSION }}" "/DArchLabel=x64" "/DBuildDir=x64" "/DSourceRoot=${{ github.workspace }}" "windows\installer\Celechron.iss"
 
       - name: Upload Installer
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: celechron-windows-x64-installer
           path: installer_output/celechron-*.exe
+          archive: false
           if-no-files-found: error
 
   build-windows-arm64:
@@ -93,10 +93,10 @@ jobs:
           & $iscc "/DAppVersion=${{ env.APP_VERSION }}" "/DArchLabel=arm64" "/DBuildDir=arm64" "/DSourceRoot=${{ github.workspace }}" "windows\installer\Celechron.iss"
 
       - name: Upload Installer
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: celechron-windows-arm64-installer
           path: installer_output/celechron-*.exe
+          archive: false
           if-no-files-found: error
 
   build-windows-x86:
@@ -138,10 +138,10 @@ jobs:
           & $iscc "/DAppVersion=${{ env.APP_VERSION }}" "/DArchLabel=x86" "/DBuildDir=x64" "/DSourceRoot=${{ github.workspace }}" "windows\installer\Celechron.iss"
 
       - name: Upload Installer
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: celechron-windows-x86-installer
           path: installer_output/celechron-*.exe
+          archive: false
           if-no-files-found: error
 
   build-macos:
@@ -178,10 +178,10 @@ jobs:
             "build/macos/Build/Products/Release/Celechron.app"
 
       - name: Upload DMG
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: celechron-macos-installer
           path: celechron-*-macos.dmg
+          archive: false
           if-no-files-found: error
 
   build-linux-x64:
@@ -242,10 +242,10 @@ jobs:
           dpkg-deb --build "$DEB_DIR"
 
       - name: Upload DEB
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: celechron-linux-x64-installer
           path: celechron_*.deb
+          archive: false
           if-no-files-found: error
 
   build-linux-arm64:
@@ -293,8 +293,8 @@ jobs:
             "
 
       - name: Upload DEB
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: celechron-linux-arm64-installer
           path: celechron_*.deb
+          archive: false
           if-no-files-found: error
