@@ -22,9 +22,13 @@ class ECardPayPage extends StatelessWidget {
   Future<String?> _requestNewCode() async {
     const secureStorage = FlutterSecureStorage();
     var synjonesAuth = await secureStorage.read(
-        key: 'synjonesAuth', iOptions: secureStorageIOSOptions);
+        key: 'synjonesAuth',
+        iOptions: secureStorageIOSOptions,
+        mOptions: secureStorageMacOsOptions);
     var eCardAccount = await secureStorage.read(
-        key: 'eCardAccount', iOptions: secureStorageIOSOptions);
+        key: 'eCardAccount',
+        iOptions: secureStorageIOSOptions,
+        mOptions: secureStorageMacOsOptions);
 
     // 未登录或测试账号：不请求真实接口，生成模拟付款码
     if (synjonesAuth == null || synjonesAuth == _testAccount) {

@@ -27,9 +27,13 @@ class ECardWidgetMessenger {
   static Future<bool> update({bool notifyNative = true}) async {
     var secureStorage = const FlutterSecureStorage();
     var username = await secureStorage.read(
-        key: 'username', iOptions: secureStorageIOSOptions);
+        key: 'username',
+        iOptions: secureStorageIOSOptions,
+        mOptions: secureStorageMacOsOptions);
     var password = await secureStorage.read(
-        key: 'password', iOptions: secureStorageIOSOptions);
+        key: 'password',
+        iOptions: secureStorageIOSOptions,
+        mOptions: secureStorageMacOsOptions);
     if (username == null || password == null) return false;
 
     // 如果是测试账号，则直接写入
@@ -37,11 +41,13 @@ class ECardWidgetMessenger {
       await secureStorage.write(
           key: 'synjonesAuth',
           value: "3200000000",
-          iOptions: secureStorageIOSOptions);
+          iOptions: secureStorageIOSOptions,
+          mOptions: secureStorageMacOsOptions);
       await secureStorage.write(
           key: 'eCardAccount',
           value: "3200000000",
-          iOptions: secureStorageIOSOptions);
+          iOptions: secureStorageIOSOptions,
+          mOptions: secureStorageMacOsOptions);
 
       if (notifyNative && (Platform.isIOS || Platform.isAndroid)) {
         await _platform.invokeMethod('update');
@@ -63,11 +69,13 @@ class ECardWidgetMessenger {
       await secureStorage.write(
           key: 'synjonesAuth',
           value: synjonesAuth,
-          iOptions: secureStorageIOSOptions);
+          iOptions: secureStorageIOSOptions,
+          mOptions: secureStorageMacOsOptions);
       await secureStorage.write(
           key: 'eCardAccount',
           value: eCardAccount,
-          iOptions: secureStorageIOSOptions);
+          iOptions: secureStorageIOSOptions,
+          mOptions: secureStorageMacOsOptions);
 
       if (notifyNative && PlatformFeatures.hasWidgetSupport) {
         await _platform.invokeMethod('update');
@@ -83,9 +91,13 @@ class ECardWidgetMessenger {
   static Future<void> logout() async {
     var secureStorage = const FlutterSecureStorage();
     await secureStorage.delete(
-        key: 'synjonesAuth', iOptions: secureStorageIOSOptions);
+        key: 'synjonesAuth',
+        iOptions: secureStorageIOSOptions,
+        mOptions: secureStorageMacOsOptions);
     await secureStorage.delete(
-        key: 'eCardAccount', iOptions: secureStorageIOSOptions);
+        key: 'eCardAccount',
+        iOptions: secureStorageIOSOptions,
+        mOptions: secureStorageMacOsOptions);
 
     if (PlatformFeatures.hasWidgetSupport) {
       await _platform.invokeMethod('logout');

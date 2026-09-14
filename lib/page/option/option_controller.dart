@@ -82,7 +82,8 @@ class OptionController extends GetxController {
     _db.secureStorage.write(
         key: 'pushOnGradeChange',
         value: value.toString(),
-        iOptions: secureStorageIOSOptions);
+        iOptions: secureStorageIOSOptions,
+        mOptions: secureStorageMacOsOptions);
 
     _updateBackgroundWorker(value || pushOnDdlReminder);
   }
@@ -96,7 +97,8 @@ class OptionController extends GetxController {
     _db.secureStorage.write(
         key: 'pushOnDdlReminder',
         value: value.toString(),
-        iOptions: secureStorageIOSOptions);
+        iOptions: secureStorageIOSOptions,
+        mOptions: secureStorageMacOsOptions);
 
     _updateBackgroundWorker(value || pushOnGradeChange);
   }

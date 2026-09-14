@@ -34,23 +34,39 @@ Future<void> refreshScholar({bool yieldToForeground = true}) async {
   var scholar = Scholar();
   var secureStorage = const FlutterSecureStorage();
   scholar.username = await secureStorage.read(
-      key: 'username', iOptions: secureStorageIOSOptions);
+      key: 'username',
+      iOptions: secureStorageIOSOptions,
+      mOptions: secureStorageMacOsOptions);
   scholar.password = await secureStorage.read(
-      key: 'password', iOptions: secureStorageIOSOptions);
-  var oldGpa =
-      await secureStorage.read(key: 'gpa', iOptions: secureStorageIOSOptions) ??
-          '0.0';
+      key: 'password',
+      iOptions: secureStorageIOSOptions,
+      mOptions: secureStorageMacOsOptions);
+  var oldGpa = await secureStorage.read(
+          key: 'gpa',
+          iOptions: secureStorageIOSOptions,
+          mOptions: secureStorageMacOsOptions) ??
+      '0.0';
   var gradedCourseCount = await secureStorage.read(
-          key: 'gradedCourseCount', iOptions: secureStorageIOSOptions) ??
+          key: 'gradedCourseCount',
+          iOptions: secureStorageIOSOptions,
+          mOptions: secureStorageMacOsOptions) ??
       '0';
   var pushOnGradeChangeFuse = await secureStorage.read(
-      key: 'pushOnGradeChangeFuse', iOptions: secureStorageIOSOptions);
+      key: 'pushOnGradeChangeFuse',
+      iOptions: secureStorageIOSOptions,
+      mOptions: secureStorageMacOsOptions);
   var pushOnGradeChange = await secureStorage.read(
-      key: 'pushOnGradeChange', iOptions: secureStorageIOSOptions);
+      key: 'pushOnGradeChange',
+      iOptions: secureStorageIOSOptions,
+      mOptions: secureStorageMacOsOptions);
   var pushOnDdlReminder = await secureStorage.read(
-      key: 'pushOnDdlReminder', iOptions: secureStorageIOSOptions);
+      key: 'pushOnDdlReminder',
+      iOptions: secureStorageIOSOptions,
+      mOptions: secureStorageMacOsOptions);
   var notifiedDdlIdsStr = await secureStorage.read(
-      key: 'notifiedDdlIds', iOptions: secureStorageIOSOptions);
+      key: 'notifiedDdlIds',
+      iOptions: secureStorageIOSOptions,
+      mOptions: secureStorageMacOsOptions);
 
   try {
     var backgroundYielded = false;
@@ -80,7 +96,8 @@ Future<void> refreshScholar({bool yieldToForeground = true}) async {
         await secureStorage.write(
             key: 'pushOnGradeChangeFuse',
             value: '1',
-            iOptions: secureStorageIOSOptions);
+            iOptions: secureStorageIOSOptions,
+            mOptions: secureStorageMacOsOptions);
       } else if (scholar.gpa[0] != double.tryParse(oldGpa) ||
           scholar.gradedCourseCount != int.tryParse(gradedCourseCount)) {
         await NotificationService.show(
@@ -93,11 +110,13 @@ Future<void> refreshScholar({bool yieldToForeground = true}) async {
       await secureStorage.write(
           key: 'gpa',
           value: scholar.gpa[0].toString(),
-          iOptions: secureStorageIOSOptions);
+          iOptions: secureStorageIOSOptions,
+          mOptions: secureStorageMacOsOptions);
       await secureStorage.write(
           key: 'gradedCourseCount',
           value: scholar.gradedCourseCount.toString(),
-          iOptions: secureStorageIOSOptions);
+          iOptions: secureStorageIOSOptions,
+          mOptions: secureStorageMacOsOptions);
     }
 
     // DDL 截止提醒
@@ -143,10 +162,11 @@ Future<void> refreshScholar({bool yieldToForeground = true}) async {
         return todo.first.endTime != null && todo.first.endTime!.isBefore(now);
       });
 
-      await secureStorage.write(
-          key: 'notifiedDdlIds',
-          value: jsonEncode(notifiedDdlIds.toList()),
-          iOptions: secureStorageIOSOptions);
+        await secureStorage.write(
+            key: 'notifiedDdlIds',
+            value: jsonEncode(notifiedDdlIds.toList()),
+            iOptions: secureStorageIOSOptions,
+            mOptions: secureStorageMacOsOptions);
     }
   } on Object catch (error, stackTrace) {
     if (kDebugMode) {

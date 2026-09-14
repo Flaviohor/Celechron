@@ -102,6 +102,7 @@ class ZjuAm {
     return _secureStorage.delete(
       key: _cookieStorageKey(username),
       iOptions: secureStorageIOSOptions,
+      mOptions: secureStorageMacOsOptions,
     );
   }
 

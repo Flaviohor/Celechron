@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -45,19 +47,30 @@ class DatabaseHelper {
     customGpaBox = await Hive.openBox(dbCustomGpa);
     secureStorage = const FlutterSecureStorage();
     // Migrate all items without groupID
-    var secureStorageItems = await secureStorage.readAll(
-        iOptions: const IOSOptions(
-            accessibility: KeychainAccessibility.first_unlock,
-            accountName: 'Celechron'));
-    await Future.forEach(secureStorageItems.entries, (e) async {
-      await secureStorage.delete(
-          key: e.key,
-          iOptions: const IOSOptions(
-              accessibility: KeychainAccessibility.first_unlock,
-              accountName: 'Celechron'));
-      await secureStorage.write(
-          key: e.key, value: e.value, iOptions: secureStorageIOSOptions);
-    });
+    if (!Platform.isWindows && !Platform.isLinux) {
+      try {
+        var secureStorageItems = await secureStorage.readAll(
+            iOptions: const IOSOptions(
+                accessibility: KeychainAccessibility.first_unlock,
+                accountName: 'Celechron'),
+            mOptions: secureStorageMacOsOptions);
+        await Future.forEach(secureStorageItems.entries, (e) async {
+          await secureStorage.delete(
+              key: e.key,
+              iOptions: const IOSOptions(
+                  accessibility: KeychainAccessibility.first_unlock,
+                  accountName: 'Celechron'),
+              mOptions: secureStorageMacOsOptions);
+          await secureStorage.write(
+              key: e.key,
+              value: e.value,
+              iOptions: secureStorageIOSOptions,
+              mOptions: secureStorageMacOsOptions);
+        });
+      } catch (e) {
+        // Ignore migration error on desktop
+      }
+    }
   }
 
   // Options
@@ -256,12 +269,18 @@ class DatabaseHelper {
     var scholar = scholarBox.get('user', defaultValue: Scholar());
     await Future.wait([
       secureStorage
-          .read(key: kUsername, iOptions: secureStorageIOSOptions)
+          .read(
+              key: kUsername,
+              iOptions: secureStorageIOSOptions,
+              mOptions: secureStorageMacOsOptions)
           .then((value) {
         if (value != null) scholar.username = value;
       }),
       secureStorage
-          .read(key: kPassword, iOptions: secureStorageIOSOptions)
+          .read(
+              key: kPassword,
+              iOptions: secureStorageIOSOptions,
+              mOptions: secureStorageMacOsOptions)
           .then((value) {
         if (value != null) scholar.password = value;
       })
@@ -276,19 +295,27 @@ class DatabaseHelper {
       secureStorage.write(
           key: kUsername,
           value: scholar.username,
-          iOptions: secureStorageIOSOptions),
+          iOptions: secureStorageIOSOptions,
+          mOptions: secureStorageMacOsOptions),
       secureStorage.write(
           key: kPassword,
           value: scholar.password,
-          iOptions: secureStorageIOSOptions)
+          iOptions: secureStorageIOSOptions,
+          mOptions: secureStorageMacOsOptions)
     ]);
   }
 
   Future<void> removeScholar() async {
     await Future.wait([
       scholarBox.delete('user'),
-      secureStorage.delete(key: kUsername, iOptions: secureStorageIOSOptions),
-      secureStorage.delete(key: kPassword, iOptions: secureStorageIOSOptions)
+      secureStorage.delete(
+          key: kUsername,
+          iOptions: secureStorageIOSOptions,
+          mOptions: secureStorageMacOsOptions),
+      secureStorage.delete(
+          key: kPassword,
+          iOptions: secureStorageIOSOptions,
+          mOptions: secureStorageMacOsOptions)
     ]);
   }
 

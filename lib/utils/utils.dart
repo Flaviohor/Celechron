@@ -33,3 +33,7 @@ const secureStorageIOSOptions = kDebugMode
         accessibility: KeychainAccessibility.first_unlock,
         accountName: 'Celechron',
         groupId: 'group.top.celechron.celechron');
+
+const secureStorageMacOsOptions = MacOsOptions(
+  useDataProtectionKeyChain: false,
+);
