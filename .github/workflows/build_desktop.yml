@@ -5,6 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  APP_VERSION: "1.0.0"
+
 jobs:
   build-windows-x64:
     name: "Windows x64"
@@ -28,11 +31,17 @@ jobs:
       - name: Build Windows x64
         run: flutter build windows --release
 
-      - name: Upload Windows x64 artifacts
+      - name: Build Installer
+        shell: pwsh
+        run: |
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          & $iscc /DAppVersion="${{ env.APP_VERSION }}" /DDestArch="x64" /DBuildDir="x64" "windows\installer\Celechron.iss"
+
+      - name: Upload Installer
         uses: actions/upload-artifact@v4
         with:
-          name: celechron-windows-x64
-          path: build/windows/x64/runner/Release/
+          name: celechron-windows-x64-installer
+          path: installer_output/celechron-*.exe
           if-no-files-found: error
 
   build-windows-arm64:
@@ -52,22 +61,16 @@ jobs:
       - name: Switch Flutter to native Windows ARM64 Dart SDK
         shell: pwsh
         run: |
-          # The Flutter SDK x64 distribution comes with an x64 Dart SDK.
-          # When running on Windows 11 ARM64 under emulation, Dart VM's Abi.current() returns Abi.windowsX64,
-          # causing Flutter to target windows-x64 instead of windows-arm64!
-          # Replacing the embedded Dart SDK with native ARM64 Dart SDK makes Abi.current() return Abi.windowsArm64.
           $versionFile = "$env:FLUTTER_ROOT\bin\cache\dart-sdk\version"
           $dartSemver = (Get-Content $versionFile).Trim().Split(" ")[0]
           Write-Host "Downloading native Windows ARM64 Dart SDK for version: $dartSemver"
           $zipPath = "$env:TEMP\dartsdk-windows-arm64.zip"
           Invoke-WebRequest -Uri "https://storage.googleapis.com/dart-archive/channels/stable/release/$dartSemver/sdk/dartsdk-windows-arm64-release.zip" -OutFile $zipPath
           
-          # Replace bin\cache\dart-sdk with arm64 version
           Remove-Item -Recurse -Force "$env:FLUTTER_ROOT\bin\cache\dart-sdk"
           Expand-Archive -Path $zipPath -DestinationPath "$env:FLUTTER_ROOT\bin\cache"
           Remove-Item -Force $zipPath
           
-          # Delete flutter_tools snapshot so it recompiles with native arm64 Dart
           Remove-Item -Force "$env:FLUTTER_ROOT\bin\cache\flutter_tools.snapshot" -ErrorAction SilentlyContinue
           Remove-Item -Force "$env:FLUTTER_ROOT\bin\cache\flutter_tools.stamp" -ErrorAction SilentlyContinue
 
@@ -83,11 +86,17 @@ jobs:
       - name: Build Windows arm64
         run: flutter build windows --release
 
-      - name: Upload Windows arm64 artifacts
+      - name: Build Installer
+        shell: pwsh
+        run: |
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          & $iscc /DAppVersion="${{ env.APP_VERSION }}" /DDestArch="arm64" /DBuildDir="arm64" "windows\installer\Celechron.iss"
+
+      - name: Upload Installer
         uses: actions/upload-artifact@v4
         with:
-          name: celechron-windows-arm64
-          path: build/windows/arm64/runner/Release/
+          name: celechron-windows-arm64-installer
+          path: installer_output/celechron-*.exe
           if-no-files-found: error
 
   build-windows-x86:
@@ -122,11 +131,17 @@ jobs:
           & $cmakePath -G "Visual Studio 17 2022" -A Win32 -S windows -B "$buildDir" -DFLUTTER_TARGET="lib\main.dart"
           & $cmakePath --build "$buildDir" --config Release
 
-      - name: Upload Windows x86 artifacts
+      - name: Build Installer
+        shell: pwsh
+        run: |
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          & $iscc /DAppVersion="${{ env.APP_VERSION }}" /DDestArch="x86" /DBuildDir="x64" "windows\installer\Celechron.iss"
+
+      - name: Upload Installer
         uses: actions/upload-artifact@v4
         with:
-          name: celechron-windows-x86
-          path: build/windows/x64/runner/Release/
+          name: celechron-windows-x86-installer
+          path: installer_output/celechron-*.exe
           if-no-files-found: error
 
   build-macos:
@@ -148,11 +163,25 @@ jobs:
       - name: Build macOS
         run: flutter build macos --release
 
-      - name: Upload macOS artifacts
+      - name: Create DMG
+        run: |
+          brew install create-dmg
+          create-dmg \
+            --volname "Celechron" \
+            --window-pos 200 120 \
+            --window-size 800 400 \
+            --icon-size 100 \
+            --icon "Celechron.app" 200 190 \
+            --hide-extension "Celechron.app" \
+            --app-drop-link 600 190 \
+            "celechron-${{ env.APP_VERSION }}-macos.dmg" \
+            "build/macos/Build/Products/Release/Celechron.app"
+
+      - name: Upload DMG
         uses: actions/upload-artifact@v4
         with:
-          name: celechron-macos
-          path: build/macos/Build/Products/Release/
+          name: celechron-macos-installer
+          path: celechron-*-macos.dmg
           if-no-files-found: error
 
   build-linux-x64:
@@ -179,11 +208,43 @@ jobs:
       - name: Build Linux
         run: flutter build linux --release
 
-      - name: Upload Linux x64 artifacts
+      - name: Create DEB package
+        run: |
+          DEB_DIR="celechron_${{ env.APP_VERSION }}_amd64"
+          mkdir -p "$DEB_DIR/DEBIAN"
+          mkdir -p "$DEB_DIR/opt/celechron"
+          mkdir -p "$DEB_DIR/usr/share/applications"
+          mkdir -p "$DEB_DIR/usr/share/icons/hicolor/256x256/apps"
+
+          cat > "$DEB_DIR/DEBIAN/control" << EOF
+          Package: celechron
+          Version: ${{ env.APP_VERSION }}
+          Architecture: amd64
+          Maintainer: nosig
+          Description: Celechron - A calendar scheduling assistant
+          EOF
+
+          cp -r build/linux/x64/release/bundle/* "$DEB_DIR/opt/celechron/"
+          ln -s /opt/celechron/celechron "$DEB_DIR/usr/bin/celechron"
+
+          cp assets/logo.png "$DEB_DIR/usr/share/icons/hicolor/256x256/apps/celechron.png" 2>/dev/null || true
+
+          cat > "$DEB_DIR/usr/share/applications/celechron.desktop" << EOF
+          [Desktop Entry]
+          Name=Celechron
+          Exec=celechron
+          Icon=celechron
+          Type=Application
+          Categories=Utility;Calendar;
+          EOF
+
+          dpkg-deb --build "$DEB_DIR"
+
+      - name: Upload DEB
         uses: actions/upload-artifact@v4
         with:
-          name: celechron-linux-x64
-          path: build/linux/x64/release/bundle/
+          name: celechron-linux-x64-installer
+          path: celechron_*.deb
           if-no-files-found: error
 
   build-linux-arm64:
@@ -208,19 +269,31 @@ jobs:
               apt-get update && \
               apt-get install -y curl git unzip xz-utils zip ninja-build \
                 libgtk-3-dev libsecret-1-dev clang cmake pkg-config \
-                liblzma-dev libstdc++-12-dev && \
+                liblzma-dev libstdc++-12-dev dpkg-dev && \
               rm -rf /var/lib/apt/lists/* && \
               git clone --depth 1 --branch stable https://github.com/flutter/flutter.git /opt/flutter && \
               export PATH=/opt/flutter/bin:/opt/flutter/bin/cache/dart-sdk/bin:\$PATH && \
               flutter precache --linux && \
               flutter config --enable-linux-desktop && \
               flutter pub get && \
-              flutter build linux --release
+              flutter build linux --release && \
+              DEB_DIR=celechron_${{ env.APP_VERSION }}_arm64 && \
+              mkdir -p \$DEB_DIR/DEBIAN && \
+              mkdir -p \$DEB_DIR/opt/celechron && \
+              mkdir -p \$DEB_DIR/usr/bin && \
+              mkdir -p \$DEB_DIR/usr/share/applications && \
+              mkdir -p \$DEB_DIR/usr/share/icons/hicolor/256x256/apps && \
+              printf 'Package: celechron\nVersion: ${{ env.APP_VERSION }}\nArchitecture: arm64\nMaintainer: nosig\nDescription: Celechron - A calendar scheduling assistant\n' > \$DEB_DIR/DEBIAN/control && \
+              cp -r build/linux/arm64/release/bundle/* \$DEB_DIR/opt/celechron/ && \
+              ln -s /opt/celechron/celechron \$DEB_DIR/usr/bin/celechron && \
+              cp assets/logo.png \$DEB_DIR/usr/share/icons/hicolor/256x256/apps/celechron.png 2>/dev/null || true && \
+              printf '[Desktop Entry]\nName=Celechron\nExec=celechron\nIcon=celechron\nType=Application\nCategories=Utility;Calendar;\n' > \$DEB_DIR/usr/share/applications/celechron.desktop && \
+              dpkg-deb --build \$DEB_DIR
             "
 
-      - name: Upload Linux arm64 artifacts
+      - name: Upload DEB
         uses: actions/upload-artifact@v4
         with:
-          name: celechron-linux-arm64
-          path: build/linux/arm64/release/bundle/
+          name: celechron-linux-arm64-installer
+          path: celechron_*.deb
           if-no-files-found: error
