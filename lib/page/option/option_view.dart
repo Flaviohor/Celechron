@@ -333,7 +333,7 @@ class OptionPage extends StatelessWidget {
                   ),
                 ]))),
             // 日程
-            Obx(() => SliverToBoxAdapter(
+            SliverToBoxAdapter(
                     child: GlassCard(
                         child: CupertinoListSection.insetGrouped(
                             backgroundColor: Color(0x00000000),
@@ -344,74 +344,13 @@ class OptionPage extends StatelessWidget {
                                 child:
                                     Text('日程', style: headerFooterTextStyle)),
                             children: [
-                      // 系统日历读写由 device_calendar 提供，只有 Android / iOS
-                      // 有实现。桌面端直接展示为不可用，并引导到 iCal 导出。
-                      if (_optionController.systemCalendarAvailable)
-                        CupertinoListTile(
-                          title: const Text('同步到系统日历'),
-                          trailing: CupertinoAsyncSwitch(
-                            value: _optionController.calendarSyncEnabled &&
-                                _optionController.hasCalendarPermission,
-                            onChanged: (value) async {
-                              await _optionController.toggleCalendarSync(
-                                  context, value);
-                            },
-                          ),
-                        )
-                      else
-                        CupertinoListTile(
-                          title: Text(
-                            '同步到系统日历',
-                            style: TextStyle(
-                              color: CupertinoDynamicColor.resolve(
-                                  CupertinoColors.quaternaryLabel, context),
-                            ),
-                          ),
-                          subtitle: Text(
-                            '桌面端暂不支持，请用下方「导出为iCal文件」再导入系统日历',
-                            style: TextStyle(
-                              color: CupertinoDynamicColor.resolve(
-                                  CupertinoColors.tertiaryLabel, context),
-                              fontSize: 13,
-                            ),
-                          ),
-                          trailing: Icon(
-                            CupertinoIcons.desktopcomputer,
-                            color: CupertinoDynamicColor.resolve(
-                                CupertinoColors.quaternaryLabel, context),
-                          ),
-                        ),
-                      CupertinoListTile(
-                        title: Text(
-                          '课表同步选项',
-                          style: TextStyle(
-                            color: _optionController.calendarSyncEnabled
-                                ? null // 使用默认颜色
-                                : CupertinoDynamicColor.resolve(
-                                    CupertinoColors.quaternaryLabel, context),
-                          ),
-                        ),
-                        trailing: BackChervonRow(
-                            child: Text('选择学期',
-                                style: TextStyle(
-                                    color: CupertinoDynamicColor.resolve(
-                                        CupertinoColors.secondaryLabel,
-                                        context),
-                                    fontSize: 16))),
-                        onTap: _optionController.calendarSyncEnabled
-                            ? () {
-                                _optionController
-                                    .showCalendarSyncDialog(context);
-                              }
-                            : null, // 禁用点击
-                      ),
                       CupertinoListTile(
                         title: const Text('导出为iCal文件'),
                         trailing: const BackChervonRow(),
                         onTap: () =>
                             _optionController.showExportDialog(context),
                       ),
-                    ])))),
+                    ]))),
             // 工具
             SliverToBoxAdapter(
                 child: GlassCard(

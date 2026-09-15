@@ -99,7 +99,7 @@ BEGIN
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "celechron" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 org.cc. All rights reserved." "\0"
-            VALUE "OriginalFilename", "celechron.exe" "\0"
+            VALUE "OriginalFilename", "PCelechron.exe" "\0"
             VALUE "ProductName", "pcelechron" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
