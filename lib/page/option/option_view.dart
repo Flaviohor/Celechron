@@ -76,7 +76,7 @@ class OptionPage extends StatelessWidget {
                         ? Padding(
                             padding: const EdgeInsets.only(left: 16),
                             child: Text(
-                                'Celechron 将不定期自动运行以刷新数据。请开启通知权限，且不要将 Celechron 从后台中移除。',
+                                'PCelechron 将不定期自动运行以刷新数据。请开启通知权限，且不要将 PCelechron 从后台中移除。',
                                 style: headerFooterTextStyle))
                         : null,
                     children: <CupertinoListTile>[
@@ -488,7 +488,7 @@ class OptionPage extends StatelessWidget {
                       child: Text('关于', style: headerFooterTextStyle)),
                   children: <CupertinoListTile>[
                     CupertinoListTile(
-                      title: const Text('关于 Celechron'),
+                      title: const Text('关于 PCelechron'),
                       trailing: BackChervonRow(
                         child: Text(_optionController.celechronVersion,
                             style: trailingTextStyle),
@@ -512,7 +512,17 @@ class OptionPage extends StatelessWidget {
                       },
                     ),
                     CupertinoListTile(
-                      title: const Text('前往项目网站'),
+                      title: const Text('PCelechron 项目网站'),
+                      trailing: const BackChervonRow(),
+                      onTap: () async {
+                        await launchUrlString(
+                          'https://github.com/Flaviohor/Celechron',
+                          mode: LaunchMode.externalApplication,
+                        );
+                      },
+                    ),
+                    CupertinoListTile(
+                      title: const Text('上游 Celechron 项目网站'),
                       trailing: BackChervonRow(
                         child: Obx(() {
                           if (_optionController.hasNewVersion) {

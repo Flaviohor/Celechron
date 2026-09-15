@@ -174,7 +174,7 @@ class _CreditsPageState extends State<CreditsPage> {
                       Column(
                         children: [
                           const Text(
-                            'Celechron',
+                            'PCelechron',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 32,
@@ -185,6 +185,16 @@ class _CreditsPageState extends State<CreditsPage> {
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Celechron的PC版本构建，目前已支持Windows/Mac OS，基于上游1.3.0，\n有任何问题请到项目仓库反馈',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: CupertinoDynamicColor.resolve(
+                                  CupertinoColors.secondaryLabel, context),
                             ),
                           ),
                         ],
@@ -227,7 +237,7 @@ class _CreditsPageState extends State<CreditsPage> {
                     height: 4,
                   ),
                   Text(
-                    '浙ICP备2024061973号-2A',
+                    'github.com/Flaviohor/Celechron',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 12,

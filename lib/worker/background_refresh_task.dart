@@ -90,7 +90,7 @@ Future<void> refreshScholar({bool yieldToForeground = true}) async {
         await NotificationService.show(
           id: 0,
           title: '首次成绩推送',
-          body: '若有新出分的课程，Celechron 将会通知您。若不需要此功能，可在 Celechron 的设置页面中关闭。',
+          body: '若有新出分的课程，PCelechron 将会通知您。若不需要此功能，可在 PCelechron 的设置页面中关闭。',
           details: NotificationService.gradeChangeDetails,
         );
         await secureStorage.write(
@@ -103,7 +103,7 @@ Future<void> refreshScholar({bool yieldToForeground = true}) async {
         await NotificationService.show(
           id: 0,
           title: '成绩变动提醒',
-          body: '有新出分的课程，可在 Celechron 的学业页面中刷新查看。',
+          body: '有新出分的课程，可在 PCelechron 的学业页面中刷新查看。',
           details: NotificationService.gradeChangeDetails,
         );
       }

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -46,31 +44,6 @@ class DatabaseHelper {
     fuseBox = await Hive.openBox(dbFuse);
     customGpaBox = await Hive.openBox(dbCustomGpa);
     secureStorage = const FlutterSecureStorage();
-    // Migrate all items without groupID
-    if (!Platform.isWindows && !Platform.isLinux) {
-      try {
-        var secureStorageItems = await secureStorage.readAll(
-            iOptions: const IOSOptions(
-                accessibility: KeychainAccessibility.first_unlock,
-                accountName: 'Celechron'),
-            mOptions: secureStorageMacOsOptions);
-        await Future.forEach(secureStorageItems.entries, (e) async {
-          await secureStorage.delete(
-              key: e.key,
-              iOptions: const IOSOptions(
-                  accessibility: KeychainAccessibility.first_unlock,
-                  accountName: 'Celechron'),
-              mOptions: secureStorageMacOsOptions);
-          await secureStorage.write(
-              key: e.key,
-              value: e.value,
-              iOptions: secureStorageIOSOptions,
-              mOptions: secureStorageMacOsOptions);
-        });
-      } catch (e) {
-        // Ignore migration error on desktop
-      }
-    }
   }
 
   // Options

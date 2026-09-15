@@ -276,27 +276,27 @@ jobs:
 
       - name: Sign macOS app (ad-hoc)
         run: |
-          APP_PATH="build/macos/Build/Products/Release/Celechron.app"
+          APP_PATH="build/macos/Build/Products/Release/PCelechron.app"
           codesign --force --deep --sign - "$APP_PATH"
 
       - name: Create DMG
         run: |
           brew install create-dmg
           create-dmg \
-            --volname "Celechron" \
+            --volname "PCelechron" \
             --window-pos 200 120 \
             --window-size 800 400 \
             --icon-size 100 \
-            --icon "Celechron.app" 200 190 \
-            --hide-extension "Celechron.app" \
+            --icon "PCelechron.app" 200 190 \
+            --hide-extension "PCelechron.app" \
             --app-drop-link 600 190 \
-            "celechron-${APP_VERSION}-macos.dmg" \
-            "build/macos/Build/Products/Release/Celechron.app"
+            "pcelechron-${APP_VERSION}-macos.dmg" \
+            "build/macos/Build/Products/Release/PCelechron.app"
 
       - name: Upload DMG
         uses: actions/upload-artifact@v7
         with:
-          path: celechron-*-macos.dmg
+          path: pcelechron-*-macos.dmg
           archive: false
           if-no-files-found: error
 
@@ -334,31 +334,31 @@ jobs:
 
       - name: Create DEB package
         run: |
-          DEB_DIR="celechron_${APP_VERSION}_amd64"
+          DEB_DIR="pcelechron_${APP_VERSION}_amd64"
           mkdir -p "$DEB_DIR/DEBIAN"
-          mkdir -p "$DEB_DIR/opt/celechron"
+          mkdir -p "$DEB_DIR/opt/pcelechron"
           mkdir -p "$DEB_DIR/usr/bin"
           mkdir -p "$DEB_DIR/usr/share/applications"
           mkdir -p "$DEB_DIR/usr/share/icons/hicolor/256x256/apps"
 
           cat > "$DEB_DIR/DEBIAN/control" << EOF
-          Package: celechron
+          Package: pcelechron
           Version: $APP_VERSION
           Architecture: amd64
-          Maintainer: nosig
-          Description: Celechron - A calendar scheduling assistant
+          Maintainer: Flaviohor
+          Description: PCelechron - A calendar scheduling assistant (PC port of Celechron)
           EOF
 
-          cp -r build/linux/x64/release/bundle/* "$DEB_DIR/opt/celechron/"
-          ln -s /opt/celechron/celechron "$DEB_DIR/usr/bin/celechron"
+          cp -r build/linux/x64/release/bundle/* "$DEB_DIR/opt/pcelechron/"
+          ln -s /opt/pcelechron/pcelechron "$DEB_DIR/usr/bin/pcelechron"
 
-          cp assets/logo.png "$DEB_DIR/usr/share/icons/hicolor/256x256/apps/celechron.png" 2>/dev/null || true
+          cp assets/logo.png "$DEB_DIR/usr/share/icons/hicolor/256x256/apps/pcelechron.png" 2>/dev/null || true
 
-          cat > "$DEB_DIR/usr/share/applications/celechron.desktop" << EOF
+          cat > "$DEB_DIR/usr/share/applications/pcelechron.desktop" << EOF
           [Desktop Entry]
-          Name=Celechron
-          Exec=celechron
-          Icon=celechron
+          Name=PCelechron
+          Exec=pcelechron
+          Icon=pcelechron
           Type=Application
           Categories=Utility;Calendar;
           EOF
@@ -368,7 +368,7 @@ jobs:
       - name: Upload DEB
         uses: actions/upload-artifact@v7
         with:
-          path: celechron_*.deb
+          path: pcelechron_*.deb
           archive: false
           if-no-files-found: error
 
@@ -410,23 +410,23 @@ jobs:
               flutter config --enable-linux-desktop && \
               flutter pub get && \
               flutter build linux --release && \
-              DEB_DIR=celechron_${APP_VERSION}_arm64 && \
+              DEB_DIR=pcelechron_${APP_VERSION}_arm64 && \
               mkdir -p \$DEB_DIR/DEBIAN && \
-              mkdir -p \$DEB_DIR/opt/celechron && \
+              mkdir -p \$DEB_DIR/opt/pcelechron && \
               mkdir -p \$DEB_DIR/usr/bin && \
               mkdir -p \$DEB_DIR/usr/share/applications && \
               mkdir -p \$DEB_DIR/usr/share/icons/hicolor/256x256/apps && \
-              printf 'Package: celechron\nVersion: ${APP_VERSION}\nArchitecture: arm64\nMaintainer: nosig\nDescription: Celechron - A calendar scheduling assistant\n' > \$DEB_DIR/DEBIAN/control && \
-              cp -r build/linux/arm64/release/bundle/* \$DEB_DIR/opt/celechron/ && \
-              ln -s /opt/celechron/celechron \$DEB_DIR/usr/bin/celechron && \
-              cp assets/logo.png \$DEB_DIR/usr/share/icons/hicolor/256x256/apps/celechron.png 2>/dev/null || true && \
-              printf '[Desktop Entry]\nName=Celechron\nExec=celechron\nIcon=celechron\nType=Application\nCategories=Utility;Calendar;\n' > \$DEB_DIR/usr/share/applications/celechron.desktop && \
+              printf 'Package: pcelechron\nVersion: ${APP_VERSION}\nArchitecture: arm64\nMaintainer: Flaviohor\nDescription: PCelechron - A calendar scheduling assistant (PC port of Celechron)\n' > \$DEB_DIR/DEBIAN/control && \
+              cp -r build/linux/arm64/release/bundle/* \$DEB_DIR/opt/pcelechron/ && \
+              ln -s /opt/pcelechron/pcelechron \$DEB_DIR/usr/bin/pcelechron && \
+              cp assets/logo.png \$DEB_DIR/usr/share/icons/hicolor/256x256/apps/pcelechron.png 2>/dev/null || true && \
+              printf '[Desktop Entry]\nName=PCelechron\nExec=pcelechron\nIcon=pcelechron\nType=Application\nCategories=Utility;Calendar;\n' > \$DEB_DIR/usr/share/applications/pcelechron.desktop && \
               dpkg-deb --build \$DEB_DIR
             "
 
       - name: Upload DEB
         uses: actions/upload-artifact@v7
         with:
-          path: celechron_*.deb
+          path: pcelechron_*.deb
           archive: false
           if-no-files-found: error

@@ -17,15 +17,13 @@ class NotificationService {
   /// - [appUserModelId] 必须与打包时（MSIX / 安装器）写入注册表的值一致，
   ///   否则通知不会显示。
   /// - [guid] 任意固定 GUID 即可，用于 Windows 通知的内部标识。
-  static const String windowsAppName = 'Celechron';
+  static const String windowsAppName = 'PCelechron';
   static const String windowsAppUserModelId = 'top.celechron.celechron';
   static const String windowsGuid = '7c85e25b-fa7d-489e-9b10-b4c22a3458f0';
 
   static bool _initialized = false;
 
   static Future<void> init() async {
-    const androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
     const darwinSettings = DarwinInitializationSettings(
       requestSoundPermission: true,
       requestBadgePermission: true,
@@ -37,7 +35,6 @@ class NotificationService {
       guid: windowsGuid,
     );
     const settings = InitializationSettings(
-      android: androidSettings,
       iOS: darwinSettings,
       macOS: darwinSettings,
       windows: windowsSettings,
@@ -77,21 +74,10 @@ class NotificationService {
   /// 请求通知权限。Android 13+ 需要显式授权，Windows / iOS 已在 init 中处理。
   static Future<void> requestPermission() async {
     await ensureInitialized();
-    await plugin
-        .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-        ?.requestNotificationsPermission();
   }
 
   /// 成绩变动提醒通道
   static const NotificationDetails gradeChangeDetails = NotificationDetails(
-    android: AndroidNotificationDetails(
-      'top.celechron.celechron.gradeChange',
-      '成绩变动提醒',
-      importance: Importance.max,
-      priority: Priority.high,
-      showWhen: false,
-    ),
     iOS: DarwinNotificationDetails(
       presentSound: true,
       presentBadge: true,
@@ -113,13 +99,6 @@ class NotificationService {
 
   /// DDL 截止提醒通道
   static const NotificationDetails ddlReminderDetails = NotificationDetails(
-    android: AndroidNotificationDetails(
-      'top.celechron.celechron.ddlReminder',
-      '作业截止提醒',
-      importance: Importance.max,
-      priority: Priority.high,
-      showWhen: false,
-    ),
     iOS: DarwinNotificationDetails(
       presentSound: true,
       presentBadge: true,

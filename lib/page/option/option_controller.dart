@@ -9,8 +9,6 @@ import 'package:celechron/database/database_helper.dart';
 import 'package:celechron/worker/ecard_widget_messenger.dart';
 import 'package:celechron/worker/fuse.dart';
 import 'package:celechron/worker/background_refresh.dart';
-import 'package:celechron/utils/platform_features.dart';
-import 'package:celechron/model/calendar_to_system.dart';
 import 'package:celechron/model/calendar_to_ical.dart';
 
 import 'package:celechron/utils/utils.dart';
@@ -22,13 +20,9 @@ class OptionController extends GetxController {
   final _db = Get.find<DatabaseHelper>(tag: 'db');
   late final RxInt allowTimeLength = _option.allowTime.length.obs;
 
-  // 日历管理器
-  late final CalendarToSystemManager _calendarManager;
-
   @override
   void onInit() {
     super.onInit();
-    _calendarManager = CalendarToSystemManager(scholar.value);
 
     _updateBackgroundWorker(
         _option.pushOnGradeChange.value || _option.pushOnDdlReminder.value);
@@ -36,12 +30,6 @@ class OptionController extends GetxController {
     ever(courseIdMappingList, (value) {
       _db.setCourseIdMappingList(value);
     });
-
-    // 系统日历同步依赖 device_calendar，只有 Android / iOS 提供了实现。
-    // 桌面端插件未注册，调用会直接抛 MissingPluginException，因此整块跳过。
-    if (PlatformFeatures.isMobile) {
-      _calendarManager.checkInitialCalendarSyncStatus();
-    }
   }
 
   Duration get workTime => _option.workTime.value;
@@ -150,52 +138,25 @@ class OptionController extends GetxController {
     CalendarToIcal.showExportDialog(context, scholar.value);
   }
 
-  /// calendar_to_system.dart: 系统日历同步相关方法
+  /// 系统日历同步 —— PC 端不支持，始终返回不可用
+  bool get systemCalendarAvailable => false;
 
-  /// 系统日历读写依赖 `device_calendar`，该插件只实现了 Android / iOS。
-  /// 桌面端插件未注册，任何调用都会抛 MissingPluginException，所以整块能力
-  /// 直接判定为不可用，UI 侧据此换成 iCal 导出。
-  bool get systemCalendarAvailable => PlatformFeatures.isMobile;
+  bool get calendarSyncEnabled => false;
 
-  // 日历同步相关getter
-  //
-  // 注意操作数顺序不能反：把内部 RxBool 放在 && 左边。桌面端
-  // systemCalendarAvailable 恒为 false，一旦把它写在前面对 RxBool 的读取就会被
-  // 短路掉——依赖这两个 getter 的 Obx（设置页「日程」区块）会一个依赖都建立不
-  // 起来，GetX 判定为 improper use 直接抛异常；而那个 Obx 处在 sliver 槽位，
-  // 抛错后错误占位组件被塞进 sliver 槽位会引发连锁布局异常，界面卡死直至进程退出。
-  bool get calendarSyncEnabled =>
-      _calendarManager.calendarSyncEnabled && systemCalendarAvailable;
-
-  bool get hasCalendarPermission =>
-      _calendarManager.hasCalendarPermission && systemCalendarAvailable;
+  bool get hasCalendarPermission => false;
 
   Future<void> toggleCalendarSync(BuildContext context, bool enabled) {
-    if (!systemCalendarAvailable) return Future<void>.value();
-    return _calendarManager.toggleCalendarSync(context, enabled);
+    return Future<void>.value();
   }
 
-  void showCalendarSyncDialog(BuildContext context) {
-    if (!systemCalendarAvailable) return;
-    _calendarManager.showCalendarSyncDialog(context);
-  }
+  void showCalendarSyncDialog(BuildContext context) {}
 
   Map<String, dynamic> getCalendarSyncStatus() {
-    if (!systemCalendarAvailable) {
-      return {
-        'available': false,
-        'enabled': false,
-        'hasPermission': false,
-        'isLoggedIn': scholar.value.isLogan,
-      };
-    }
-    final stats = _calendarManager.getSyncStats();
     return {
-      'available': true,
-      'enabled': calendarSyncEnabled,
-      'hasPermission': hasCalendarPermission,
+      'available': false,
+      'enabled': false,
+      'hasPermission': false,
       'isLoggedIn': scholar.value.isLogan,
-      ...stats,
     };
   }
 }

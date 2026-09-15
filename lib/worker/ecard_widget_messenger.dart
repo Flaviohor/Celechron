@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:celechron/utils/platform_features.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -49,7 +47,7 @@ class ECardWidgetMessenger {
           iOptions: secureStorageIOSOptions,
           mOptions: secureStorageMacOsOptions);
 
-      if (notifyNative && (Platform.isIOS || Platform.isAndroid)) {
+      if (notifyNative && PlatformFeatures.hasWidgetSupport) {
         await _platform.invokeMethod('update');
       }
       return true;

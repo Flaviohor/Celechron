@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:get/get.dart';
 import 'package:celechron/algorithm/arrange.dart';
 import 'package:celechron/database/database_helper.dart';
@@ -7,7 +6,6 @@ import 'package:celechron/model/task.dart';
 import 'package:celechron/model/period.dart';
 import 'package:celechron/model/scholar.dart';
 import 'package:celechron/utils/utils.dart';
-import 'package:celechron/pigeon/flow_messenger.dart';
 
 class FlowController extends GetxController {
   final scholar = Get.find<Rx<Scholar>>(tag: 'scholar');
@@ -19,7 +17,6 @@ class FlowController extends GetxController {
   late var _scholarFlowList = scholar.value.periods;
   var _currentScholarFlowCursor = -1;
   var timeNow = DateTime.now().obs;
-  final _flowMessenger = FlowMessenger();
   Timer? _timer;
   // 数据变化时置位，下一秒执行完整 walk；平时按 _nextWalkAt 的时间边界调度
   bool _walkPending = false;
@@ -462,57 +459,6 @@ class FlowController extends GetxController {
   }
 
   void refreshWidget() {
-    // 只有 iOS 需要向原生小组件发送数据，其他平台不必构建 DTO
-    if (!Platform.isIOS) return;
-    List<PeriodDto?>? flowListDto =
-        flowList.where((e) => e.type == PeriodType.flow).map((e) {
-      return PeriodDto(
-        uid: e.uid,
-        type: PeriodTypeDto.flow,
-        name: e.summary,
-        startTime: e.startTime.millisecondsSinceEpoch ~/ 1000,
-        endTime: e.endTime.millisecondsSinceEpoch ~/ 1000,
-        location: e.location,
-      );
-    }).toList();
-    flowListDto.addAll(_scholarFlowList
-        .map((e) => PeriodDto(
-              uid: e.uid,
-              type: e.type == PeriodType.classes
-                  ? PeriodTypeDto.classes
-                  : PeriodTypeDto.test,
-              name: e.summary,
-              startTime: e.startTime.millisecondsSinceEpoch ~/ 1000,
-              endTime: e.endTime.millisecondsSinceEpoch ~/ 1000,
-              location: e.type == PeriodType.classes
-                  ? e.location.replaceAll(RegExp(r'[(（].*录播.*[)）]'), '')
-                  : e.location,
-            ))
-        .toList());
-    for (var task in taskList.where((e) => e.type == TaskType.fixed)) {
-      DateTime time = DateTime.now();
-      DateTime? last;
-      for (int i = 0; i < 5; i++) {
-        Period? period = task.deadlineOfTime(time, predicting: true);
-        if (period != null) {
-          if (last == null || last.compareTo(period.startTime) != 0) {
-            flowListDto.add(PeriodDto(
-              uid: period.uid,
-              type: PeriodTypeDto.user,
-              name: task.summary,
-              startTime: period.startTime.millisecondsSinceEpoch ~/ 1000,
-              endTime: period.endTime.millisecondsSinceEpoch ~/ 1000,
-              location: task.location,
-            ));
-            last = period.startTime.copyWith();
-          }
-        }
-        time = time.add(Duration(days: task.repeatPeriod));
-      }
-    }
-
-    if (Platform.isIOS) {
-      _flowMessenger.transfer(FlowMessage(flowListDto: flowListDto));
-    }
+    // PC 端无需向原生小组件发送数据
   }
 }

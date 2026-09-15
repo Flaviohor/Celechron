@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:get/get.dart';
 
 import 'package:celechron/database/database_helper.dart';
@@ -8,7 +7,7 @@ class Fuse {
   late DateTime lastUpdateTime;
 
   final bool isBeta = false;
-  final version = [1, 3, 0];
+  final version = [99, 0, 0];
   final build = 1;
   List<int>? remoteVersion;
   int? remoteBuild;
@@ -17,7 +16,7 @@ class Fuse {
   final HttpClient _httpClient = HttpClient();
   final DatabaseHelper _db = Get.find<DatabaseHelper>(tag: 'db');
 
-  String get displayVersion => version.join('.') + (isBeta ? ' beta' : '');
+  String get displayVersion => 'PC-1.0.0';
 
   Fuse() {
     lastUpdateTime = DateTime(2001, 1, 1);
@@ -31,15 +30,8 @@ class Fuse {
       }
 
       late String checkUpdateUrl;
-      if (Platform.isAndroid) {
-        checkUpdateUrl =
-            "https://api.celechron.top/checkUpdate?platform=android";
-      } else if (Platform.isIOS) {
-        checkUpdateUrl = "https://api.celechron.top/checkUpdate?platform=ios";
-      } else {
-        checkUpdateUrl =
-            "https://api.celechron.top/checkUpdate?platform=others";
-      }
+      checkUpdateUrl =
+          "https://api.celechron.top/checkUpdate?platform=others";
 
       var request = await _httpClient
           .getUrl(Uri.parse(checkUpdateUrl))

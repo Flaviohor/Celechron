@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:crypto/crypto.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:celechron/model/location_mapper.dart';
@@ -168,27 +167,12 @@ class CalendarToIcal {
     );
   }
 
-  /// 判断是否为 iPad
-  static Future<bool> _isIPad() async {
-    if (!Platform.isIOS) return false;
-    final deviceInfo = DeviceInfoPlugin();
-    final iosInfo = await deviceInfo.iosInfo;
-    return iosInfo.model.toLowerCase().contains('ipad');
-  }
+  /// 判断是否为 iPad —— PC 端始终返回 false
+  static Future<bool> _isIPad() async => false;
 
-  /// 计算分享位置（iPad 必需）
+  /// 计算分享位置（iPad 必需）—— PC 端始终返回 null
   static Future<Rect?> _calculateSharePositionOrigin(
-      BuildContext? context) async {
-    if (context == null) return null;
-    if (!(await _isIPad())) return null;
-    // 检查 context 是否仍然有效（避免在 async gap 后使用无效的 context）
-    if (!context.mounted) return null;
-    final box = context.findRenderObject() as RenderBox?;
-    if (box != null && box.hasSize) {
-      return box.localToGlobal(Offset.zero) & box.size;
-    }
-    return null;
-  }
+      BuildContext? context) async => null;
 
   /// 从Scholar对象生成iCal
   static String generateIcalFromScholar({

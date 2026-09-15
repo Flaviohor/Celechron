@@ -1,10 +1,10 @@
-# Celechron
+# PCelechron
 
 <div style="text-align: center; ">
 
 <img src="./banner.png" style="width: 80%;">
 
-服务于浙大学生的时间管理器
+服务于浙大学生的时间管理器（PC 桌面版）
 
 日程一览 · 课表查看 · DDL 助手 · 成绩查询
 
@@ -19,7 +19,7 @@
 
 ## 致谢
 
-本仓库是 [Celechron/Celechron](https://github.com/Celechron/Celechron) 的 Windows 桌面端分支，目前还有很多bug，非常简陋。**没有上游就没有这个项目**，在此向上游的每一位原作者与贡献者致谢。
+本仓库是 [Celechron/Celechron](https://github.com/Celechron/Celechron) 的 PC 桌面端分支（PCelechron），目前支持 Windows / macOS。**没有上游就没有这个项目**，在此向上游的每一位原作者与贡献者致谢。
 
 **开发**
 

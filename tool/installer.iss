@@ -1,4 +1,4 @@
-; Celechron Windows 安装器脚本（Inno Setup 6）
+; PCelechron Windows 安装器脚本（Inno Setup 6）
 ;
 ; 一份脚本同时服务本地与 CI，差异全部走命令行 /D 覆盖。
 ;
@@ -15,17 +15,17 @@
 ;
 ; 可覆盖开关：AppVersion / ArchLabel / BuildDir / SourceRoot / StageDir / OutputDir
 ; 产物统一落在 {#OutputDir}（默认 installer_output\），文件名
-;   Celechron-<版本>-windows-<架构>-setup.exe
+;   PCelechron-<版本>-windows-<架构>-setup.exe
 
-#define AppName      "Celechron"
-#define AppExeName   "Celechron.exe"
-#define AppPublisher "Celechron contributors"
-#define AppURL       "https://github.com/Celechron/Celechron"
+#define AppName      "PCelechron"
+#define AppExeName   "PCelechron.exe"
+#define AppPublisher "PCelechron contributors"
+#define AppURL       "https://github.com/Flaviohor/Celechron"
 
 ; ---- 开关默认值：命令行给了就用命令行的（#ifndef 只在未定义时生效）----
 
 #ifndef AppVersion
-  #define AppVersion "1.3.0"
+  #define AppVersion "PC-1.0.0"
 #endif
 
 #ifndef ArchLabel
@@ -128,7 +128,7 @@ Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: deskto
 ; ---- celechron:// 深链协议 ----
 ; 桌面端这一项必须由安装器写入注册表，否则 AppLinks 收不到任何事件。
 Root: HKA; Subkey: "Software\Classes\celechron"; ValueType: string; ValueName: ""; \
-  ValueData: "URL:Celechron Protocol"; Flags: uninsdeletekey; Tasks: urlprotocol
+  ValueData: "URL:PCelechron Protocol"; Flags: uninsdeletekey; Tasks: urlprotocol
 Root: HKA; Subkey: "Software\Classes\celechron"; ValueType: string; ValueName: "URL Protocol"; \
   ValueData: ""; Tasks: urlprotocol
 Root: HKA; Subkey: "Software\Classes\celechron\DefaultIcon"; ValueType: string; ValueName: ""; \
@@ -148,7 +148,7 @@ procedure InitializeWizard();
 begin
   RemoveDataPage := CreateInputOptionPage(wpSelectTasks,
     '数据清理设置', '是否在卸载时删除本地数据',
-    'Celechron 的数据库保存在「文档」文件夹下（dbuser.hive 等）。' + #13#10 +
+    'PCelechron 的数据库保存在「文档」文件夹下（dbuser.hive 等）。' + #13#10 +
     '选择「是」表示卸载本程序时一并删除这些文件（登录信息与本地缓存会丢失，不可恢复）。' + #13#10 +
     '默认保留，卸载后可手动删除。',
     True, False);

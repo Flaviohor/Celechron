@@ -2,9 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show Colors;
-import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
 import 'package:celechron/services/notification_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
@@ -127,10 +124,6 @@ class _CelechronAppState extends State<CelechronApp>
     _initAppLinks();
     // 初始化通知
     _initNotification();
-    // 设置Android状态栏和导航栏样式
-    if (Platform.isAndroid) {
-      _initStatusBar();
-    }
   }
 
   @override
@@ -196,8 +189,8 @@ class _CelechronAppState extends State<CelechronApp>
             data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
             child: child!,
           ),
-          title: 'Celechron',
-          home: const HomePage(title: 'Celechron'),
+          title: 'PCelechron',
+          home: const HomePage(title: 'PCelechron'),
           initialRoute: '/',
           routes: {
             '/ecardpaypage': (context) => ECardPayPage(),
@@ -245,41 +238,6 @@ class _CelechronAppState extends State<CelechronApp>
         stackTrace: stackTrace,
       );
     }
-  }
-
-  void _initStatusBar() {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    var brightnessMode = Get.find<Option>(tag: 'option').brightnessMode;
-    var dispatcher = SchedulerBinding.instance.platformDispatcher;
-
-    ever(brightnessMode, (mode) {
-      if (mode == BrightnessMode.system) {
-        SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-          statusBarIconBrightness:
-              dispatcher.platformBrightness == Brightness.light
-                  ? Brightness.dark
-                  : Brightness.light,
-          systemNavigationBarColor: Colors.transparent,
-        ));
-        dispatcher.onPlatformBrightnessChanged = () {
-          SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-            statusBarIconBrightness:
-                dispatcher.platformBrightness == Brightness.light
-                    ? Brightness.dark
-                    : Brightness.light,
-            systemNavigationBarColor: Colors.transparent,
-          ));
-        };
-      } else {
-        dispatcher.onPlatformBrightnessChanged = null;
-        SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-          statusBarIconBrightness:
-              mode == BrightnessMode.light ? Brightness.dark : Brightness.light,
-          systemNavigationBarColor: Colors.transparent,
-        ));
-      }
-    });
-    brightnessMode.refresh();
   }
 
   /// 通知初始化。各平台的初始化设置集中在 NotificationService 里，

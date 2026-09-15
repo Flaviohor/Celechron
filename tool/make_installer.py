@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""用 Windows 内置的 IExpress + 7-Zip 生成单文件安装器 Celechron-Setup.exe。
+"""用 Windows 内置的 IExpress + 7-Zip 生成单文件安装器 PCelechron-Setup.exe。
 
 为什么不用 Inno Setup：本机未安装，且当前网络下从 GitHub 拉 10MB 安装包
 屡次被代理截断。IExpress 是 Windows 自带的自解压打包器，配合 7-Zip 的
@@ -8,13 +8,13 @@ LZMA2 压缩，同样能产出单个 Setup.exe。
 
 整体结构：
     IExpress 包（扁平，无子目录 —— IExpress 对子目录支持不可靠）
-      ├── Celechron.7z    整个应用（含 VC++ 运行时 DLL）
+      ├── PCelechron.7z    整个应用（含 VC++ 运行时 DLL）
       ├── 7z.exe / 7z.dll 解压用
       ├── install.cmd     入口（ASCII，转调 PowerShell）
       ├── install.ps1     实际安装逻辑（UTF-8 BOM，可写中文）
       └── uninstall.ps1   卸载逻辑
 
-产出：dist/Celechron-<ver>-windows-x64-setup.exe
+产出：dist/PCelechron-<ver>-windows-x64-setup.exe
 """
 
 import os
@@ -25,7 +25,7 @@ from pathlib import Path
 
 ROOT = Path(r"E:\celechron-windows")
 DIST = ROOT / "dist"
-STAGE_APP = DIST / "Celechron-1.3.0-windows-x64"
+STAGE_APP = DIST / "PCelechron-PC-1.0.0-windows-x64"
 
 SEVENZIP_DIR = Path(r"E:\7-Zip")
 SEVENZIP_EXE = SEVENZIP_DIR / "7z.exe"
@@ -33,8 +33,8 @@ SEVENZIP_DLL = SEVENZIP_DIR / "7z.dll"
 
 IEXPRESS = Path(r"C:\Windows\System32\iexpress.exe")
 
-APP_NAME = "Celechron"
-APP_VERSION = "1.3.0"
+APP_NAME = "PCelechron"
+APP_VERSION = "PC-1.0.0"
 PACK_NAME = "celechron-iexpress-stage"
 SETUP_BASENAME = f"{APP_NAME}-{APP_VERSION}-windows-x64-setup"
 
@@ -53,12 +53,12 @@ exit /b %ERRORLEVEL%
 # --------------------------------------------------------------------------
 INSTALL_PS1 = r"""$ErrorActionPreference = 'Stop'
 $src = $PSScriptRoot
-$appName = 'Celechron'
-$version = '1.3.0'
+$appName = 'PCelechron'
+$version = 'PC-1.0.0'
 # 不要用 $env:LOCALAPPDATA / $env:APPDATA —— 环境变量可能被裁剪掉（实测过 APPDATA 为空），
 # GetFolderPath 走 Shell API，任何时候都可靠。
-$target = Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'Programs\Celechron'
-$logFile = Join-Path ([IO.Path]::GetTempPath()) 'celechron-install.log'
+$target = Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'Programs\PCelechron'
+$logFile = Join-Path ([IO.Path]::GetTempPath()) 'pcelechron-install.log'
 $log = New-Object System.Collections.Generic.List[string]
 
 function Say($m) {
@@ -70,16 +70,16 @@ function Fail($m) {
   Say ("[失败] " + $m)
   $log -join "`r`n" | Set-Content -Path $logFile -Encoding UTF8
   $ws = New-Object -ComObject WScript.Shell
-  $ws.Popup("Celechron 安装失败：`r`n`r`n" + $m + "`r`n`r`n详细信息见：`r`n" + $logFile, 0, "Celechron 安装程序", 16) | Out-Null
+  $ws.Popup("PCelechron 安装失败：`r`n`r`n" + $m + "`r`n`r`n详细信息见：`r`n" + $logFile, 0, "PCelechron 安装程序", 16) | Out-Null
   exit 1
 }
 
 try {
-  Say ("Celechron " + $version + " 安装开始  " + (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))
+  Say ("PCelechron " + $version + " 安装开始  " + (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))
 
   # 已安装的旧版本可能在运行，文件会被占用
   if (Get-Process -Name $appName -ErrorAction SilentlyContinue) {
-    Say "检测到 Celechron 正在运行，先关闭它"
+    Say "检测到 PCelechron 正在运行，先关闭它"
     Get-Process -Name $appName -ErrorAction SilentlyContinue | Stop-Process -Force
     Start-Sleep -Seconds 2
   }
@@ -104,7 +104,7 @@ try {
     $lnk.TargetPath = $exePath
     $lnk.WorkingDirectory = $target
     $lnk.IconLocation = $exePath + ',0'
-    $lnk.Description = 'Celechron 课程表与学业助手'
+    $lnk.Description = 'PCelechron 课程表与学业助手'
     $lnk.Save()
     Say "      开始菜单"
   }
@@ -114,7 +114,7 @@ try {
     $lnk2.TargetPath = $exePath
     $lnk2.WorkingDirectory = $target
     $lnk2.IconLocation = $exePath + ',0'
-    $lnk2.Description = 'Celechron 课程表与学业助手'
+    $lnk2.Description = 'PCelechron 课程表与学业助手'
     $lnk2.Save()
     Say "      桌面"
   }
@@ -137,9 +137,9 @@ try {
   }
   $un = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Celechron'
   New-Item -Path $un -Force | Out-Null
-  Set-ItemProperty -Path $un -Name 'DisplayName'     -Value ('Celechron ' + $version)
+  Set-ItemProperty -Path $un -Name 'DisplayName'     -Value ('PCelechron ' + $version)
   Set-ItemProperty -Path $un -Name 'DisplayVersion'  -Value $version
-  Set-ItemProperty -Path $un -Name 'Publisher'       -Value 'Celechron contributors'
+  Set-ItemProperty -Path $un -Name 'Publisher'       -Value 'PCelechron contributors'
   Set-ItemProperty -Path $un -Name 'InstallLocation' -Value $target
   Set-ItemProperty -Path $un -Name 'DisplayIcon'     -Value $exePath
   Set-ItemProperty -Path $un -Name 'UninstallString' -Value ('powershell -NoProfile -ExecutionPolicy Bypass -File "' + (Join-Path $target 'uninstall.ps1') + '"')
@@ -147,7 +147,7 @@ try {
   New-ItemProperty -Path $un -Name 'NoRepair' -Value 1 -PropertyType DWord -Force | Out-Null
   Say "      已注册到「应用和功能」"
 
-  Say "[5/5] 启动 Celechron"
+  Say "[5/5] 启动 PCelechron"
   Start-Process -FilePath $exePath -WorkingDirectory $target
 
   Say "安装完成"
@@ -168,8 +168,8 @@ try {
 # --------------------------------------------------------------------------
 UNINSTALL_PS1 = r"""param([switch]$Worker)
 
-$appName = 'Celechron'
-$target = Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'Programs\Celechron'
+$appName = 'PCelechron'
+$target = Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'Programs\PCelechron'
 $proto = 'HKCU:\Software\Classes\celechron'
 $unkey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Celechron'
 
@@ -191,15 +191,15 @@ if ($desktop) { Remove-Item (Join-Path $desktop ($appName + '.lnk')) -Force -Err
 Remove-Item $proto -Recurse -Force -ErrorAction SilentlyContinue
 Remove-Item $unkey -Recurse -Force -ErrorAction SilentlyContinue
 
-$tmp = Join-Path ([IO.Path]::GetTempPath()) 'celechron-uninstall-worker.ps1'
+$tmp = Join-Path ([IO.Path]::GetTempPath()) 'pcelechron-uninstall-worker.ps1'
 Copy-Item $PSCommandPath $tmp -Force
 Start-Process powershell -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ('"' + $tmp + '"'), '-Worker') -WindowStyle Hidden
 
 $docs = [Environment]::GetFolderPath('MyDocuments')
-$msg = "Celechron 已卸载。`r`n`r`n你的数据仍然保留在：`r`n" + $docs + "`r`n" + `
+$msg = "PCelechron 已卸载。`r`n`r`n你的数据仍然保留在：`r`n" + $docs + "`r`n" + `
        "（dbuser.hive、dboptions.hive 等）`r`n`r`n如需彻底清理请手动删除这些文件。"
 $ws = New-Object -ComObject WScript.Shell
-$ws.Popup($msg, 0, 'Celechron 卸载', 64) | Out-Null
+$ws.Popup($msg, 0, 'PCelechron 卸载', 64) | Out-Null
 """
 
 
@@ -208,7 +208,7 @@ def log(m):
 
 
 def build_payload(stage_dir: Path) -> Path:
-    """把暂存的应用目录压成 Celechron.7z。"""
+    """把暂存的应用目录压成 PCelechron.7z。"""
     out = stage_dir / f"{APP_NAME}.7z"
     if out.exists():
         out.unlink()
@@ -310,7 +310,7 @@ def main():
 
     log("[4/6] 生成 IExpress 描述文件")
     files = [
-        stage / "Celechron.7z",
+        stage / f"{APP_NAME}.7z",
         stage / "7z.exe",
         stage / "7z.dll",
         stage / "install.cmd",
