@@ -21,7 +21,7 @@ BUILD = ROOT / "build" / "windows" / "x64" / "runner" / "Release"
 DIST = ROOT / "dist"
 
 APP_NAME = "PCelechron"
-APP_VERSION = "PC-1.0.0"
+APP_VERSION = "1.0.1"
 
 # 需要的 CRT 文件（app-local 部署）
 CRT_FILES = [

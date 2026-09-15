@@ -15,6 +15,7 @@ import 'package:celechron/design/round_rectangle_card.dart';
 import 'package:celechron/design/custom_colors.dart';
 import 'package:celechron/page/scholar/course_detail/course_detail_view.dart';
 import 'package:celechron/page/calendar/schedule_view.dart';
+import 'package:celechron/utils/platform_features.dart';
 import 'calendar_controller.dart';
 
 class CalendarPage extends StatelessWidget {
@@ -27,6 +28,9 @@ class CalendarPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
+      // 桌面端内容区透明，让 AppBackdrop 透到玻璃后面；移动端保持主题背景。
+      backgroundColor:
+          PlatformFeatures.isDesktop ? const Color(0x00000000) : null,
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
