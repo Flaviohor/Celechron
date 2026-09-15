@@ -119,10 +119,21 @@ Name: "urlprotocol"; Description: "注册 celechron:// 深链协议（用于桌�
 ; 整包安装（暂存目录里已含 VC++ 运行时 DLL）
 Source: "{#StageDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "使用说明.txt"
 
+[InstallDelete]
+; 先删掉可能存在的旧快捷方式再重建。旧 .lnk 会被 Windows 图标缓存住，
+; 只更新目标 exe 的图标资源、沿用同名 .lnk，桌面可能一直显示旧图标。
+; 删除后由 [Icons] 重新生成，配合安装结束时的图标缓存刷新，桌面图标才会更新。
+Type: files; Name: "{autodesktop}\{#AppName}.lnk"
+Type: files; Name: "{commondesktop}\{#AppName}.lnk"; Check: IsAdminInstallMode
+Type: files; Name: "{group}\{#AppName}.lnk"
+
 [Icons]
-Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"
+; 显式指定 IconFilename/IconIndex，避免依赖 shell 对目标的图标推断。
+Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"; \
+  IconFilename: "{app}\{#AppExeName}"; IconIndex: 0
 Name: "{group}\卸载 {#AppName}"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: desktopicon
+Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; \
+  IconFilename: "{app}\{#AppExeName}"; IconIndex: 0; Tasks: desktopicon
 
 [Registry]
 ; ---- celechron:// 深链协议 ----
@@ -137,6 +148,9 @@ Root: HKA; Subkey: "Software\Classes\celechron\shell\open\command"; ValueType: s
   ValueData: """{app}\{#AppExeName}"" ""%1"""; Tasks: urlprotocol
 
 [Run]
+; 刷新 shell 图标缓存，否则桌面/开始菜单可能继续显示旧图标。
+; ie4uinit.exe -show 会重建图标缓存且不需要重启 explorer。
+Filename: "{sys}\ie4uinit.exe"; Parameters: "-show"; Flags: runhidden
 Filename: "{app}\{#AppExeName}"; Description: "立即运行 {#AppName}"; \
   Flags: nowait postinstall skipifsilent
 
