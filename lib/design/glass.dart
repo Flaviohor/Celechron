@@ -406,8 +406,7 @@ class AppBackdrop extends StatelessWidget {
           Positioned.fill(
             child: CustomPaint(painter: _AmbientGlowPainter(isDark: isDark)),
           ),
-          if (pointerGlow)
-            Positioned.fill(child: _PointerGlow(isDark: isDark)),
+          if (pointerGlow) Positioned.fill(child: _PointerGlow(isDark: isDark)),
           child,
         ],
       ),

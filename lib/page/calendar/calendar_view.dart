@@ -29,9 +29,8 @@ class CalendarPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       // 桌面端内容区透明，让 AppBackdrop 透到玻璃后面；移动端保持主题背景。
-      backgroundColor: PlatformFeatures.isDesktop
-          ? const Color(0x00000000)
-          : null,
+      backgroundColor:
+          PlatformFeatures.isDesktop ? const Color(0x00000000) : null,
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
