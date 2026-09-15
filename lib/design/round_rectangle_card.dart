@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 
+import 'package:celechron/design/glass.dart';
+import 'package:celechron/utils/platform_features.dart';
+
 class RoundRectangleCard extends StatefulWidget {
   final Widget child;
   final Function()? onTap;
@@ -64,34 +67,44 @@ class _RoundRectangleCardState extends State<RoundRectangleCard>
   Widget build(BuildContext context) {
     final brightness = CupertinoTheme.of(context).brightness ??
         MediaQuery.of(context).platformBrightness;
+    final bool isDark = brightness == Brightness.dark;
     var isDown = false;
     var isCancel = false;
-    var core = Container(
+
+    // 桌面端把卡片做成液态玻璃：不再用不透明的 secondarySystemBackground，
+    // 改成半透明 tint + 背景模糊，让窗口底色里的色斑与随指针走的柔光透上来。
+    // 移动端保持原来的实心卡片（玻璃是桌面端专属的观感处理）。
+    late final Widget core;
+    if (PlatformFeatures.isDesktop) {
+      final List<BoxShadow>? shadows = widget.boxShadow.isEmpty
+          ? const <BoxShadow>[]
+          : (isDark ? null : widget.boxShadow);
+      core = GlassSurface(
+        sigma: 16,
+        borderRadius: BorderRadius.circular(12),
+        // 不传 tint / tintOpacity，走主题自动值：
+        // 深色 = 白 @0.085 的微亮半透明板，浅色 = 白磨砂板。
+        // 深色下用黑色 tint 会把卡片压成比背景更暗的块，反而更平。
+        borderOpacity: isDark ? 0.16 : 0.5,
+        boxShadow: shadows,
         padding: widget.padding,
-        // decoration: BoxDecoration(
-        //     borderRadius: BorderRadius.circular(12),
-        //     // In light mode, color is white; in dark mode, color is black
-        //     color: SchedulerBinding
-        //                 .instance.platformDispatcher.platformBrightness ==
-        //             Brightness.dark
-        //         ? CupertinoDynamicColor.resolve(
-        //             CupertinoColors.secondarySystemBackground, context)
-        //         : CupertinoDynamicColor.resolve(CupertinoColors.white, context),
-        //     boxShadow: SchedulerBinding
-        //                 .instance.platformDispatcher.platformBrightness ==
-        //             Brightness.dark
-        //         ? null
-        //         : widget.boxShadow),
-        // 修改了颜色控制逻辑，应该跟随应用设置而非系统设置
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: brightness == Brightness.dark ? null : widget.boxShadow,
-          color: brightness == Brightness.dark
-              ? CupertinoDynamicColor.resolve(
-                  CupertinoColors.secondarySystemBackground, context)
-              : CupertinoDynamicColor.resolve(CupertinoColors.white, context),
-        ),
-        child: widget.child);
+        child: widget.child,
+      );
+    } else {
+      core = Container(
+          padding: widget.padding,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: isDark ? null : widget.boxShadow,
+            color: isDark
+                ? CupertinoDynamicColor.resolve(
+                    CupertinoColors.secondarySystemBackground, context)
+                : CupertinoDynamicColor.resolve(
+                    CupertinoColors.white, context),
+          ),
+          child: widget.child);
+    }
+
     return widget.animate
         ? GestureDetector(
             onTapDown: (_) async {

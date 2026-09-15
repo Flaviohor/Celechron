@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:celechron/model/task.dart';
 import 'package:celechron/model/period.dart';
+import 'package:celechron/utils/platform_features.dart';
 import 'task_edit_page.dart';
 import 'dart:async';
 import 'package:get/get.dart';
@@ -526,6 +527,10 @@ class TaskPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
+      // 桌面端内容区透明，让 AppBackdrop 透到玻璃后面；移动端保持主题背景。
+      backgroundColor: PlatformFeatures.isDesktop
+          ? const Color(0x00000000)
+          : null,
       child: SafeArea(
         child: CustomScrollView(
           slivers: [

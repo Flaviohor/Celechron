@@ -25,7 +25,7 @@
 ; ---- 开关默认值：命令行给了就用命令行的（#ifndef 只在未定义时生效）----
 
 #ifndef AppVersion
-  #define AppVersion "1.3.0"
+  #define AppVersion "1.3.1"
 #endif
 
 #ifndef ArchLabel

@@ -757,8 +757,11 @@ class ScholarPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-        /*backgroundColor: CupertinoDynamicColor.resolve(
-            CupertinoColors.systemGroupedBackground, context),*/
+        // 桌面端内容区透明，让 AppBackdrop 的色斑与柔光透到玻璃后面；
+        // 移动端保持主题的 systemBackground。
+        backgroundColor: PlatformFeatures.isDesktop
+            ? const Color(0x00000000)
+            : null,
         child: CustomScrollView(
       slivers: [
         SliverPinnedToBoxAdapter(

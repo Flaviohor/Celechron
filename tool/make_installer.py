@@ -25,7 +25,6 @@ from pathlib import Path
 
 ROOT = Path(r"E:\celechron-windows")
 DIST = ROOT / "dist"
-STAGE_APP = DIST / "Celechron-1.3.0-windows-x64"
 
 SEVENZIP_DIR = Path(r"E:\7-Zip")
 SEVENZIP_EXE = SEVENZIP_DIR / "7z.exe"
@@ -34,9 +33,13 @@ SEVENZIP_DLL = SEVENZIP_DIR / "7z.dll"
 IEXPRESS = Path(r"C:\Windows\System32\iexpress.exe")
 
 APP_NAME = "Celechron"
-APP_VERSION = "1.3.0"
+APP_VERSION = "1.3.1"
 PACK_NAME = "celechron-iexpress-stage"
 SETUP_BASENAME = f"{APP_NAME}-{APP_VERSION}-windows-x64-setup"
+
+# tool/package.py 生成的暂存目录；必须跟版本号走（原来写死过 1.3.0，
+# 版本一改就找不到目录）。
+STAGE_APP = DIST / f"Celechron-{APP_VERSION}-windows-x64"
 
 # --------------------------------------------------------------------------
 # install.cmd —— 保持纯 ASCII。IExpress 的 AppLaunched 走 cmd 时，
