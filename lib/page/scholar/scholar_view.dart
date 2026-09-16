@@ -1,4 +1,6 @@
 // Official packages
+import 'dart:ui';
+
 import 'package:celechron/page/scholar/todo/todo_card.dart';
 import 'package:celechron/http/zjuServices/exceptions.dart';
 import 'package:celechron/utils/platform_features.dart';
@@ -764,23 +766,18 @@ class ScholarPage extends StatelessWidget {
         child: CustomScrollView(
           slivers: [
             SliverPinnedToBoxAdapter(
+                child: ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: PlatformFeatures.isDesktop ? 25 : 0,
+                  sigmaY: PlatformFeatures.isDesktop ? 25 : 0,
+                ),
                 child: Container(
               decoration: BoxDecoration(
                 color: PlatformFeatures.isDesktop
-                    ? const Color(0x00000000)
+                    ? const Color(0x80F0F0F0)
                     : CupertinoDynamicColor.resolve(
                         CupertinoColors.systemBackground, context),
-                /*boxShadow: [
-              BoxShadow(
-                color: CupertinoDynamicColor.resolve(
-                    CupertinoColors.systemGrey5, context),
-                offset: const Offset(0, 0),
-                blurRadius: 4,
-              ),
-            ],
-            borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(16),
-                bottomRight: Radius.circular(16)),*/
               ),
               child: Padding(
                   padding: EdgeInsets.only(
@@ -961,6 +958,8 @@ class ScholarPage extends StatelessWidget {
                       height: 14,
                     ),
                   ])),
+                    ),
+                  ),
             )),
             if (_scholarController.scholar.isLogan)
               CupertinoSliverRefreshControl(
