@@ -174,6 +174,14 @@ class _CelechronAppState extends State<CelechronApp>
                     : Brightness.light,
             scaffoldBackgroundColor: CupertinoColors.systemBackground,
             barBackgroundColor: CupertinoColors.systemBackground,
+            textTheme: CupertinoTextThemeData(
+              textStyle: TextStyle(
+                fontFamily: 'HarmonyOS Sans',
+                fontSize: 16,
+                color: CupertinoDynamicColor.resolve(
+                    CupertinoColors.label, context),
+              ),
+            ),
           ),
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,

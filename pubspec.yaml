@@ -1,7 +1,7 @@
 name: celechron
 description: Time scheduler for zjuers.
 publish_to: "none"
-version: 1.0.1+1
+version: 1.0.2+1
 environment:
   sdk: ">=3.0.0"
 
@@ -84,3 +84,19 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+  fonts:
+    - family: HarmonyOS Sans
+      fonts:
+        - asset: fonts/HarmonyOS_Sans_Thin.ttf
+          weight: 100
+        - asset: fonts/HarmonyOS_Sans_Light.ttf
+          weight: 300
+        - asset: fonts/HarmonyOS_Sans_Regular.ttf
+          weight: 400
+        - asset: fonts/HarmonyOS_Sans_Medium.ttf
+          weight: 500
+        - asset: fonts/HarmonyOS_Sans_Bold.ttf
+          weight: 700
+        - asset: fonts/HarmonyOS_Sans_Black.ttf
+          weight: 900
