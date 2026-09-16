@@ -609,28 +609,48 @@ class Glass {
 
 /// 把任何子 widget 套上玻璃卡片。
 ///
-/// 与 [Glass.card] 的区别：本组件只做「模糊背景层 + 边框 + 高光 + 阴影 + 圆角」，
-/// 不画 tint 色（tintOpacity=0），让调用方提供的子 widget 自己负责前景色。
-/// 适合在 CupertinoListSection 这种本身有背景色的 widget 外面套一层。
+/// 与 [Glass.card] 的区别：本组件更薄、圆角更小，默认带一层低不透明度的
+/// 磨砂 tint，让子 widget（如 `CupertinoListSection`）看起来落在真正的
+/// 玻璃面板上，而不是直接浮在背景上。
 class GlassCard extends StatelessWidget {
   const GlassCard({
     super.key,
     required this.child,
     this.sigma = 18,
     this.borderRadius = const BorderRadius.all(Radius.circular(14)),
+    this.tint,
+    this.tintOpacity,
+    this.specular = true,
+    this.margin,
   });
 
   final Widget child;
   final double sigma;
   final BorderRadius borderRadius;
 
+  /// tint 颜色基色；不传则用白色。
+  final Color? tint;
+
+  /// tint 不透明度；不传则按明暗主题取磨砂值（浅色 0.42 / 深色 0.08）。
+  final double? tintOpacity;
+
+  /// 是否叠一层随指针移动的镜面高光（液态玻璃的关键观感）。
+  final bool specular;
+
+  /// 面板外边距；用于让玻璃面板与内部列表对齐同一水平内缩。
+  final EdgeInsetsGeometry? margin;
+
   @override
   Widget build(BuildContext context) {
+    final bool isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
     return GlassSurface(
       sigma: sigma,
       borderRadius: borderRadius,
-      tintOpacity: 0,
+      tint: tint,
+      tintOpacity: tintOpacity ?? (isDark ? 0.08 : 0.42),
       borderOpacity: 0.22,
+      specular: specular,
+      margin: margin,
       boxShadow: <BoxShadow>[
         BoxShadow(
           color: CupertinoColors.black.withValues(alpha: 0.10),

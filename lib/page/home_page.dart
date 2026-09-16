@@ -190,7 +190,10 @@ class _HomePageState extends State<HomePage> {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+        // 桌面端内容区透明，让 AppBackdrop 透到玻璃后面；移动端保持主题背景。
+        color: PlatformFeatures.isDesktop
+            ? const Color(0x00000000)
+            : CupertinoTheme.of(context).scaffoldBackgroundColor,
       ),
       child: Stack(
         children: [

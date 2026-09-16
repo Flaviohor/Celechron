@@ -19,6 +19,40 @@ import 'package:celechron/worker/ecard_widget_messenger.dart';
 import 'package:celechron/database/database_helper.dart';
 import 'package:celechron/utils/global.dart';
 
+/// 应用级内嵌字体族名，与 pubspec.yaml 的 fonts 段保持一致。
+const String kAppFontFamily = 'HarmonyOS Sans';
+
+/// 构建全局 Cupertino 主题，并让所有文本样式都使用内嵌字体。
+///
+/// 只设置 [CupertinoTextThemeData.textStyle] 并不够：按钮、导航栏、标签栏、
+/// 选择器分别读取 `actionTextStyle` / `navTitleTextStyle` / `tabLabelTextStyle`
+/// 等样式，若不逐一设置，它们仍会回退到系统字体。这里统一套用同一字体族。
+CupertinoThemeData buildAppCupertinoTheme(BrightnessMode mode) {
+  final CupertinoTextThemeData base = const CupertinoThemeData().textTheme;
+  TextStyle withFont(TextStyle style) =>
+      style.copyWith(fontFamily: kAppFontFamily);
+  return CupertinoThemeData(
+    brightness: mode == BrightnessMode.system
+        ? null
+        : mode == BrightnessMode.dark
+            ? Brightness.dark
+            : Brightness.light,
+    scaffoldBackgroundColor: CupertinoColors.systemBackground,
+    barBackgroundColor: CupertinoColors.systemBackground,
+    textTheme: CupertinoTextThemeData(
+      textStyle: withFont(base.textStyle),
+      actionTextStyle: withFont(base.actionTextStyle),
+      actionSmallTextStyle: withFont(base.actionSmallTextStyle),
+      tabLabelTextStyle: withFont(base.tabLabelTextStyle),
+      navTitleTextStyle: withFont(base.navTitleTextStyle),
+      navLargeTitleTextStyle: withFont(base.navLargeTitleTextStyle),
+      navActionTextStyle: withFont(base.navActionTextStyle),
+      pickerTextStyle: withFont(base.pickerTextStyle),
+      dateTimePickerTextStyle: withFont(base.dateTimePickerTextStyle),
+    ),
+  );
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   ECardWidgetMessenger.installNativeHandler();
@@ -166,23 +200,7 @@ class _CelechronAppState extends State<CelechronApp>
   Widget build(BuildContext context) {
     var brightnessMode = Get.find<Option>(tag: 'option').brightnessMode;
     return Obx(() => GetCupertinoApp(
-          theme: CupertinoThemeData(
-            brightness: brightnessMode.value == BrightnessMode.system
-                ? null
-                : brightnessMode.value == BrightnessMode.dark
-                    ? Brightness.dark
-                    : Brightness.light,
-            scaffoldBackgroundColor: CupertinoColors.systemBackground,
-            barBackgroundColor: CupertinoColors.systemBackground,
-            textTheme: CupertinoTextThemeData(
-              textStyle: TextStyle(
-                fontFamily: 'HarmonyOS Sans',
-                fontSize: 16,
-                color: CupertinoDynamicColor.resolve(
-                    CupertinoColors.label, context),
-              ),
-            ),
-          ),
+          theme: buildAppCupertinoTheme(brightnessMode.value),
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,

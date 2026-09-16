@@ -63,9 +63,9 @@ class OptionPage extends StatelessWidget {
             // 教务
             Obx(() => SliverToBoxAdapter(
                     child: GlassCard(
+                  margin: _defaultMargin,
                   child: CupertinoListSection.insetGrouped(
                     backgroundColor: Color(0x00000000),
-                    margin: _defaultMargin,
                     additionalDividerMargin: 2,
                     header: Container(
                         padding: const EdgeInsets.only(left: 16),
@@ -218,10 +218,10 @@ class OptionPage extends StatelessWidget {
             // 时间规划
             SliverToBoxAdapter(
                 child: GlassCard(
+                    margin: _defaultMargin,
                     child: CupertinoListSection.insetGrouped(
                         backgroundColor: Color(0x00000000),
                         additionalDividerMargin: 2,
-                        margin: _defaultMargin,
                         header: Container(
                             padding: const EdgeInsets.only(left: 16),
                             child: Text('时间规划', style: headerFooterTextStyle)),
@@ -346,10 +346,10 @@ class OptionPage extends StatelessWidget {
             // 日程
             SliverToBoxAdapter(
                     child: GlassCard(
+                        margin: _defaultMargin,
                         child: CupertinoListSection.insetGrouped(
                             backgroundColor: Color(0x00000000),
                             additionalDividerMargin: 2,
-                            margin: _defaultMargin,
                             header: Container(
                                 padding: const EdgeInsets.only(left: 16),
                                 child:
@@ -366,10 +366,10 @@ class OptionPage extends StatelessWidget {
             // 工具
             SliverToBoxAdapter(
                 child: GlassCard(
+                    margin: _defaultMargin,
                     child: CupertinoListSection.insetGrouped(
                         backgroundColor: Color(0x00000000),
                         additionalDividerMargin: 2,
-                        margin: _defaultMargin,
                         header: Container(
                             padding: const EdgeInsets.only(left: 16),
                             child: Text('工具', style: headerFooterTextStyle)),
@@ -403,10 +403,10 @@ class OptionPage extends StatelessWidget {
             // 关于
             SliverToBoxAdapter(
                 child: GlassCard(
+              margin: _defaultMargin,
               child: CupertinoListSection.insetGrouped(
                 backgroundColor: Color(0x00000000),
                 additionalDividerMargin: 2,
-                margin: _defaultMargin,
                 header: Container(
                   padding: const EdgeInsets.only(left: 16),
                   child: Text('诊断与测试', style: headerFooterTextStyle),
@@ -433,10 +433,10 @@ class OptionPage extends StatelessWidget {
             // 关于
             SliverToBoxAdapter(
                 child: GlassCard(
+              margin: _defaultMargin,
               child: CupertinoListSection.insetGrouped(
                   backgroundColor: Color(0x00000000),
                   additionalDividerMargin: 2,
-                  margin: _defaultMargin,
                   header: Container(
                       padding: const EdgeInsets.only(left: 16),
                       child: Text('关于', style: headerFooterTextStyle)),
