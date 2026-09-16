@@ -20,7 +20,7 @@ import 'package:celechron/database/database_helper.dart';
 import 'package:celechron/utils/global.dart';
 
 /// 应用级内嵌字体族名，与 pubspec.yaml 的 fonts 段保持一致。
-const String kAppFontFamily = 'HarmonyOS Sans';
+const String kAppFontFamily = 'HarmonyOS Sans SC';
 
 /// 构建全局 Cupertino 主题，并让所有文本样式都使用内嵌字体。
 ///

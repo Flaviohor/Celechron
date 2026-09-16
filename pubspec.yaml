@@ -86,7 +86,7 @@ flutter:
   # see https://flutter.dev/custom-fonts/#from-packages
 
   fonts:
-    - family: HarmonyOS Sans
+    - family: HarmonyOS Sans SC
       fonts:
         - asset: fonts/HarmonyOS_Sans_Thin.ttf
           weight: 100

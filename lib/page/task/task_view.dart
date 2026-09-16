@@ -535,6 +535,7 @@ class TaskPage extends StatelessWidget {
           slivers: [
             CupertinoSliverNavigationBar(
               largeTitle: const Text('任务'),
+              backgroundColor: PlatformFeatures.isDesktop ? const Color(0x00000000) : null,
               border: null,
               stretch: true,
               trailing: // Two buttons in the nav bar.

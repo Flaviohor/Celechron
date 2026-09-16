@@ -583,6 +583,7 @@ class FlowPage extends StatelessWidget {
             CupertinoSliverNavigationBar(
               largeTitle: const Text('接下来'),
               stretch: true,
+              backgroundColor: PlatformFeatures.isDesktop ? const Color(0x00000000) : null,
               border: null,
               trailing: // Two buttons in the nav bar.
                   Row(

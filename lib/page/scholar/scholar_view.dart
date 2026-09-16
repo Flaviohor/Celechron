@@ -766,8 +766,10 @@ class ScholarPage extends StatelessWidget {
             SliverPinnedToBoxAdapter(
                 child: Container(
               decoration: BoxDecoration(
-                color: CupertinoDynamicColor.resolve(
-                    CupertinoColors.systemBackground, context),
+                color: PlatformFeatures.isDesktop
+                    ? const Color(0x00000000)
+                    : CupertinoDynamicColor.resolve(
+                        CupertinoColors.systemBackground, context),
                 /*boxShadow: [
               BoxShadow(
                 color: CupertinoDynamicColor.resolve(
