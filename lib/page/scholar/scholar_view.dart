@@ -769,13 +769,13 @@ class ScholarPage extends StatelessWidget {
                 child: ClipRect(
               child: BackdropFilter(
                 filter: ImageFilter.blur(
-                  sigmaX: PlatformFeatures.isDesktop ? 25 : 0,
-                  sigmaY: PlatformFeatures.isDesktop ? 25 : 0,
+                  sigmaX: PlatformFeatures.isDesktop ? 18 : 0,
+                  sigmaY: PlatformFeatures.isDesktop ? 18 : 0,
                 ),
                 child: Container(
               decoration: BoxDecoration(
                 color: PlatformFeatures.isDesktop
-                    ? const Color(0x80F0F0F0)
+                    ? const Color(0x00000000)
                     : CupertinoDynamicColor.resolve(
                         CupertinoColors.systemBackground, context),
               ),
