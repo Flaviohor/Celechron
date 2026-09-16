@@ -64,12 +64,13 @@ class OptionPage extends StatelessWidget {
             Obx(() => SliverToBoxAdapter(
                     child: GlassCard(
                   margin: _defaultMargin,
-                  child: CupertinoListSection.insetGrouped(
-                    backgroundColor: Color(0x00000000),
-                    additionalDividerMargin: 2,
-                    header: Container(
-                        padding: const EdgeInsets.only(left: 16),
-                        child: Text('教务', style: headerFooterTextStyle)),
+                    child: CupertinoListSection.insetGrouped(
+                      backgroundColor: Color(0x00000000),
+                      decoration: const BoxDecoration(color: Color(0x00000000)),
+                      additionalDividerMargin: 2,
+                      header: Container(
+                          padding: const EdgeInsets.only(left: 16),
+                          child: Text('教务', style: headerFooterTextStyle)),
                     footer: (_optionController.pushOnGradeChange ||
                                 _optionController.pushOnDdlReminder) &&
                             _optionController.scholar.value.isLogan
@@ -221,6 +222,7 @@ class OptionPage extends StatelessWidget {
                     margin: _defaultMargin,
                     child: CupertinoListSection.insetGrouped(
                         backgroundColor: Color(0x00000000),
+                        decoration: const BoxDecoration(color: Color(0x00000000)),
                         additionalDividerMargin: 2,
                         header: Container(
                             padding: const EdgeInsets.only(left: 16),
@@ -349,6 +351,7 @@ class OptionPage extends StatelessWidget {
                         margin: _defaultMargin,
                         child: CupertinoListSection.insetGrouped(
                             backgroundColor: Color(0x00000000),
+                            decoration: const BoxDecoration(color: Color(0x00000000)),
                             additionalDividerMargin: 2,
                             header: Container(
                                 padding: const EdgeInsets.only(left: 16),
@@ -369,6 +372,7 @@ class OptionPage extends StatelessWidget {
                     margin: _defaultMargin,
                     child: CupertinoListSection.insetGrouped(
                         backgroundColor: Color(0x00000000),
+                        decoration: const BoxDecoration(color: Color(0x00000000)),
                         additionalDividerMargin: 2,
                         header: Container(
                             padding: const EdgeInsets.only(left: 16),
@@ -406,6 +410,7 @@ class OptionPage extends StatelessWidget {
               margin: _defaultMargin,
               child: CupertinoListSection.insetGrouped(
                 backgroundColor: Color(0x00000000),
+                decoration: const BoxDecoration(color: Color(0x00000000)),
                 additionalDividerMargin: 2,
                 header: Container(
                   padding: const EdgeInsets.only(left: 16),
@@ -436,6 +441,7 @@ class OptionPage extends StatelessWidget {
               margin: _defaultMargin,
               child: CupertinoListSection.insetGrouped(
                   backgroundColor: Color(0x00000000),
+                  decoration: const BoxDecoration(color: Color(0x00000000)),
                   additionalDividerMargin: 2,
                   header: Container(
                       padding: const EdgeInsets.only(left: 16),

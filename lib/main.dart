@@ -211,10 +211,16 @@ class _CelechronAppState extends State<CelechronApp>
             Locale('en'),
           ],
           locale: const Locale('zh'),
-          builder: (context, child) => MediaQuery(
-            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-            child: child!,
-          ),
+          builder: (context, child) {
+            final base = DefaultTextStyle.of(context).style;
+            return DefaultTextStyle.merge(
+              style: base.copyWith(fontFamily: kAppFontFamily),
+              child: MediaQuery(
+                data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+                child: child!,
+              ),
+            );
+          },
           title: 'PCelechron',
           home: const HomePage(title: 'PCelechron'),
           initialRoute: '/',
