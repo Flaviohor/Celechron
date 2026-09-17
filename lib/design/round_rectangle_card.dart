@@ -82,9 +82,7 @@ class _RoundRectangleCardState extends State<RoundRectangleCard>
       core = GlassSurface(
         sigma: 16,
         borderRadius: BorderRadius.circular(12),
-        // 不传 tint / tintOpacity，走主题自动值：
-        // 深色 = 白 @0.085 的微亮半透明板，浅色 = 白磨砂板。
-        // 深色下用黑色 tint 会把卡片压成比背景更暗的块，反而更平。
+        tintOpacity: isDark ? 0.085 : 0.80,
         borderOpacity: isDark ? 0.16 : 0.5,
         boxShadow: shadows,
         padding: widget.padding,
