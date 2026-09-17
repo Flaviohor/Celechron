@@ -351,6 +351,30 @@ def main():
         log(f"[x] 安装器大小异常：{size} B")
         return 1
 
+    # 给安装器签名 —— 没证书就跳过，不会让构建失败。
+    # sign_dist.ps1 会顺带检查便携目录（如果 package.py 已签过，这里再次签名无害）。
+    log("[7/7] 给安装器签名（无证书则跳过）")
+    if sys.platform != "win32":
+        log("    非 Windows，跳过")
+    else:
+        sign_dist = ROOT / "tool" / "sign_dist.ps1"
+        if sign_dist.exists():
+            r = subprocess.run(
+                [shutil.which("pwsh") or shutil.which("powershell") or "powershell",
+                 "-NoProfile", "-ExecutionPolicy", "Bypass",
+                 "-File", str(sign_dist),
+                 "-DistDir", str(DIST)],
+                capture_output=True, text=True, errors="replace",
+            )
+            for line in r.stdout.splitlines():
+                log("    " + line)
+            for line in r.stderr.splitlines():
+                log("    " + line)
+            if r.returncode != 0:
+                log(f"    [!] sign_dist.ps1 exit={r.returncode}（不影响安装器生成本身）")
+        else:
+            log(f"    [!] 未找到 {sign_dist}，跳过")
+
     print()
     print("=" * 60)
     print(f"  安装器   {out_setup}")

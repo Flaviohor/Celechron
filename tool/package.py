@@ -151,6 +151,31 @@ def main():
                 z.write(full, Path(name) / full.relative_to(stage))
     print(f"    -> {zip_path.name}  {zip_path.stat().st_size / 1048576:.1f} MB")
 
+    # 签名 —— 没证书就跳过，不会让构建失败。
+    # Windows 平台专属行为，Linux/macOS 上没意义也跑不动 signtool。
+    print(f"[5/5] 给便携目录里的 PE 签名（无证书则跳过）")
+    if sys.platform != "win32":
+        print("    非 Windows，跳过")
+    else:
+        sign_dist = ROOT / "tool" / "sign_dist.ps1"
+        if sign_dist.exists():
+            r = subprocess.run(
+                [shutil.which("pwsh") or shutil.which("powershell") or "powershell",
+                 "-NoProfile", "-ExecutionPolicy", "Bypass",
+                 "-File", str(sign_dist),
+                 "-DistDir", str(DIST)],
+                capture_output=True, text=True, errors="replace",
+            )
+            # sign_dist 没找到证书时会 exit 0 并打 WARNING —— 这里透传输出。
+            for line in r.stdout.splitlines():
+                print("    " + line)
+            for line in r.stderr.splitlines():
+                print("    " + line)
+            if r.returncode != 0:
+                print(f"    [!] sign_dist.ps1 exit={r.returncode}（不影响打包本身）")
+        else:
+            print(f"    [!] 未找到 {sign_dist}，跳过")
+
     print()
     print("=" * 56)
     print(f"  暂存目录  {stage}")

@@ -76,9 +76,20 @@ cd /e/celechron-windows
 ## 三之二、打包分发
 
 ```bash
+python tool/subset_fonts.py    # 可选：把 fonts/HarmonyOS_Sans_*.ttf 子集化（47MB -> 1.7MB）
 python tool/package.py         # 便携版：dist/Celechron-<ver>-windows-x64/ + portable.zip
 python tool/make_installer.py  # 单文件安装器：dist/Celechron-<ver>-windows-x64-setup.exe
 ```
+
+> **字体子集化。** 6 个 HarmonyOS Sans SC 字重原始 ~8MB × 6 ≈ 47MB，
+> 子集化（基于项目实际用到的 ~1500 个字符 + 一份安全垫）后单字重 ~290KB，
+> 总共 ~1.7MB。备份自动落在 `fonts/_unsorted.bak/`（脚本已自动加入 `.gitignore`）。
+> 只需跑一次，结果存盘后下次跳过 —— 但 **新增 UI 字符串 / 改语言文案后需要重跑**
+> 否则新加的字会掉成豆腐块。脚本会输出 `build/font-chars.txt` 报告当前字符集，
+> 适合提交 PR 时一并 review。
+
+> 安装器未做代码签名，首次运行会被 SmartScreen 拦（点「更多信息 → 仍要运行」）。
+> 详见第八节「代码签名：不花钱能做什么」。
 
 ### 便携版（zip）
 
@@ -119,8 +130,6 @@ Celechron-1.3.0-windows-x64-setup.exe
 > 所以脚本里一律改用 `[Environment]::GetFolderPath()` 取目录，它走 Shell API 不受影响。
 > 另外 `.ps1` 要写中文必须存成 **UTF-8 带 BOM**，否则 PowerShell 5.1 按 ANSI 读会乱码
 > 甚至报语法错误。
-
-> 安装器未做代码签名，首次运行会被 SmartScreen 拦（点「更多信息 → 仍要运行」）。
 
 ---
 
@@ -364,8 +373,22 @@ pub 包全走国内镜像，实测 0.7MB/s。GitHub 只在 git 依赖那一步�
 
 ## 七、尚未完成 / 已知限制
 
-1. **代码签名未做。** 程序和安装器都没签名，首次运行会被 SmartScreen 拦。
-   正式分发需要代码签名证书（约 ¥1000~3000/年）。
+1. **代码签名只签了「自签」，SmartScreen 仍会拦。** 已新增三个签名脚本：
+   - `tool/sign.ps1` —— Authenticode 通用签名工具（找 signtool.exe、RFC3161 时间戳、签后立即校验）
+   - `tool/make_test_cert.ps1` —— 生成 5 年有效的自签代码签名证（OpenSSL 风格，绑当前 Windows 账户）
+   - `tool/sign_dist.ps1` —— 给 dist 里的 PE 和安装器批量签名，没证书时不阻塞构建
+
+   `package.py` / `make_installer.py` 已经在最后一步自动调用 `sign_dist.ps1`。
+
+   **自签 ≠ 真证。** 微软的 SmartScreen 不会因为「有签名」就放行，自签证和没签名一样拦。
+   真正免拦要靠「文件哈希信誉」—— 同一个发布者标识下大量被正常下载运行后才会慢慢放开，
+   这个过程数周到数月不等，且 2024 年后 EV 证书也不再有「立即信誉」特权。
+
+   **不花钱的实际缓解办法**（详见第八节）：
+   - GitHub Releases 分发：README 写清楚「点更多信息 → 仍要运行」是已知步骤
+   - 浙大校内分发：放进 ZJU 软件镜像或校内网盘，受众都是会点忽略的用户
+   - SignPath.io OSS 版：开源软件免费 EV 级签名云服务，但需申请审批
+   - Microsoft Store 个人开发者：一次性 $19 注册，重新签名 = 完全免拦
 
 2. **应用数据落在「文档」根目录。** `Hive.initFlutter()` 在桌面端解析到
    `getApplicationDocumentsDirectory()`，即 `C:\Users\<用户>\Documents\`，
@@ -388,3 +411,71 @@ pub 包全走国内镜像，实测 0.7MB/s。GitHub 只在 git 依赖那一步�
    - 通知实际弹出（插件 17 → 22 的 API 变更）
    - iCal 导出的系统分享面板（`share_plus` 的 Windows 实现）
    - `celechron://ecardpaypage` 深链跳转（协议已注册，但未验证跳转）
+
+---
+
+## 八、代码签名：不花钱能做什么
+
+| 方案 | 成本 | SmartScreen | 适用 |
+|---|---|---|---|
+| 不签名（当前） | ¥0 | 警告「未知发布者」 | 内部/小范围 |
+| 自签 + sign.ps1 | ¥0 | 同上，自签不算数 | 满足 GPO「必须签」之类策略 |
+| GitHub Releases + README 引导 | ¥0 | 同上，但用户知道点「更多信息 → 仍要运行」 | 开源分发 |
+| 浙大校内网盘 / 镜像 | ¥0 | 同上 | 校内受众 |
+| SignPath.io OSS | ¥0 | 走真实 EV 但需审批 | 开源软件可申请 |
+| Microsoft Partner 个人账号 | $19 一次性 | **完全不警告**（微软重签） | 长期稳定分发首选 |
+
+### 现状
+
+`tool/sign.ps1` + `make_test_cert.ps1` 已经能跑通。本机实测：用 `New-SelfSignedCertificate`
+生成 5 年自签证，再签名一个最小 PE，signtool verify /pa /v 能正确显示：
+
+```
+Issued to: PCelechron Dev Signing (TEST ONLY, not for distribution)
+Issued by: PCelechron Dev Signing (TEST ONLY, not for distribution)
+Expires:   Wed Sep 17 10:58:02 2031
+SHA1 hash: B54C5DACB097F22F04D491942410614520396B25
+The signature is timestamped: Thu Sep 17 11:00:25 2026
+Timestamp Verified by: DigiCert Assured ID Root CA
+```
+
+自签带来的好处：
+- 文件右键 → 属性 → 「数字签名」标签里有内容可看；
+- 企业环境要求「二进制必须签」类 GPO 不再卡；
+- 时间戳服务可用 DigiCert（默认）/ Sectigo / GlobalSign 的 RFC3161 地址，证书过期签名也有效。
+
+自签解决不了的：
+- SmartScreen 拦截 —— 微软官方明确说「Self-signed Certificate 跟 No signature 一个待遇」。
+
+### 推荐路线（按工作量从小到大）
+
+1. **先用自签跑起来**：跑 `make_test_cert.ps1`，后续 `package.py` 会自动签。
+   - 投入：0
+   - 用户体验：SmartScreen 警告 + 文件有签名
+2. **改走 GitHub Releases**：在 README 里加一段「首次启动会被 SmartScreen 拦 → 点更多信息 → 仍要运行」的说明，把这个当成「产品教程」的一部分。
+   - 投入：半小时改 README
+   - 用户体验：同上，但用户预期已对齐
+3. **SignPath.io OSS 申请**：填表说明 PCelechron 是 GPL 开源、学生工具，等 1-2 周审批。批下来后他们提供 EV 级云签名服务。
+   - 投入：1-2 周等审批
+   - 用户体验：**完全不警告**（前提是装机量够大让信誉积累）
+4. **Microsoft Store 个人开发者账号**：注册一次 $19，提交 PCelechron 给微软审核。审核通过后用户从 Store 安装，**永远不会有 SmartScreen 警告**（微软会用他们的证书重新签）。
+   - 投入：注册 $19 + 提交审核 1-2 周
+   - 用户体验：用户从开始菜单「应用」里启动，完全原生
+
+### 拿到真证后怎么接
+
+脚本已经设计成兼容真证。买证后只要：
+
+1. 证书装入 Windows 个人证书库（一般是 p12/pfx 双击导入，选「个人」）；
+2. 跑 `tool/sign_dist.ps1` —— 自动按 Code Signing EKU 挑证书；
+3. 想强制用某张：`powershell tool/sign_dist.ps1 -Subject 'CN=你的公司名'`。
+
+如果证书配了硬件 UKey（多数 OV/EV 都强制要求），需要先把 UKey 厂商驱动装好，
+signtool 会通过 Windows CSP 自动访问。私钥导不出是常态，不是 bug。
+
+### 长期不签名的兜底措辞（参考）
+
+```
+首次运行若弹出 SmartScreen 提示，是因为本软件未在微软商店上架（需一次性 $19 注册费），
+非恶意软件。选「更多信息 → 仍要运行」即可。
+```

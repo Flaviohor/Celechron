@@ -5,9 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:celechron/services/notification_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive/hive.dart';
 import 'package:app_links/app_links.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'package:celechron/model/scholar.dart';
 import 'package:celechron/model/option.dart';
@@ -17,6 +16,7 @@ import 'package:celechron/services/diagnostic_log_service.dart';
 import 'package:celechron/services/refresh_coordinator.dart';
 import 'package:celechron/worker/ecard_widget_messenger.dart';
 import 'package:celechron/database/database_helper.dart';
+import 'package:celechron/database/hive_paths.dart';
 import 'package:celechron/utils/global.dart';
 
 /// 应用级内嵌字体族名，与 pubspec.yaml 的 fonts 段保持一致。
@@ -61,10 +61,17 @@ void main() async {
   await RefreshCoordinator.setForegroundActive(true);
 
   // 初始化数据库
-  await Hive.initFlutter();
+  // - 桌面端把 Hive 数据落到 APPDATA（`%APPDATA%\Celechron\Celechron`），
+  //   移动端保持 Documents（避免破坏现有数据）。
+  // - 第一次启动时若 Documents 下有 .hive 旧文件，一次性拷过来，
+  //   旧文件保留由用户自行决定是否删除。
+  // 见 lib/database/hive_paths.dart。
+  final hiveRoot = await HivePaths.resolveHiveRoot();
+  await HivePaths.migrateFromLegacyDocumentsIfNeeded(hiveRoot);
+  Hive.init(hiveRoot.path);
   // Windows 上若上次进程被强杀，Hive 留下的 .lock 0 字节文件会卡住下一次的
   // openBox（mmap 锁未释放，errno=33）。这里清掉陈旧锁文件。
-  await _purgeStaleHiveLocks();
+  await _purgeStaleHiveLocks(hiveRoot);
   var db = Get.put(DatabaseHelper(), tag: 'db');
   await db.init();
 
@@ -94,9 +101,8 @@ void main() async {
   }
 }
 
-Future<void> _purgeStaleHiveLocks() async {
+Future<void> _purgeStaleHiveLocks(Directory dir) async {
   try {
-    final dir = Directory(await _hiveRootPath());
     if (!dir.existsSync()) return;
     for (final ent in dir.listSync(followLinks: false)) {
       if (ent is! File) continue;
@@ -106,14 +112,6 @@ Future<void> _purgeStaleHiveLocks() async {
       } on Object catch (_) {/* 仍被占用就不动，让 Hive 自行报错 */}
     }
   } on Object catch (_) {/* 失败也无所谓，开不了就让它正常报错 */}
-}
-
-Future<String> _hiveRootPath() async {
-  try {
-    return (await getApplicationDocumentsDirectory()).path;
-  } on Object catch (_) {
-    return Directory.systemTemp.path;
-  }
 }
 
 Future<void> _refreshRestoredScholar(Rx<Scholar> scholar) async {
