@@ -5,23 +5,27 @@ on:
     branches: [main]
   workflow_dispatch:
     inputs:
-      target_platform:
-        description: 'Target platform to build'
+      target_platforms:
+        description: |
+          逗号分隔的架构列表。可选值：
+            windows-x64, windows-arm64, windows-x86,
+            macos, linux-x64, linux-arm64, all
+          例子：
+            "windows-x64"
+            "windows-x64,windows-arm64,macos"
+            "all"
         required: true
-        default: 'all'
-        type: choice
-        options:
-          - all
-          - macos
-          - windows-x64
-          - windows-arm64
-          - windows-x86
-          - linux-x64
-          - linux-arm64
+        default: 'windows-x64'
+        type: string
+      version:
+        description: '版本号（留空则用 pubspec.yaml 的当前值，如 "1.3.3"）'
+        required: false
+        default: ''
+        type: string
 
-# 版本号统一从 pubspec.yaml 读，避免和 App 版本脱节（这些 job 里的
-# 「Resolve app version」步骤会把它写进 $GITHUB_ENV，后续步骤用 $APP_VERSION /
-# $env:APP_VERSION 取值）。
+# 版本号优先取 workflow_dispatch 的 `version` 输入；空时从 pubspec.yaml 解析。
+# 所有 job 里的「Resolve app version」步骤会把结果写进 $GITHUB_ENV，
+# 后续步骤用 $APP_VERSION / $env:APP_VERSION 取值。
 #
 # Windows 安装器由 tool/installer.iss（Inno Setup 6）生成到 installer_output/。
 # 打包前先把 VC++ 运行库拷进构建产物（app-local 部署），否则装到没装
@@ -31,7 +35,7 @@ jobs:
   build-windows-x64:
     name: "Windows x64"
     runs-on: windows-latest
-    if: ${{ github.event_name == 'push' || github.event.inputs.target_platform == 'all' || github.event.inputs.target_platform == 'windows-x64' }}
+    if: ${{ github.event_name == 'push' || contains(github.event.inputs.target_platforms, 'all') || contains(github.event.inputs.target_platforms, 'windows-x64') }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -39,7 +43,13 @@ jobs:
       - name: Resolve app version
         shell: bash
         run: |
-          v=$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | head -1 | cut -d+ -f1)
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            v="${{ github.event.inputs.version }}"
+            echo "version from workflow input override: $v"
+          else
+            v=$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | head -1 | cut -d+ -f1)
+            echo "version from pubspec.yaml: $v"
+          fi
           echo "APP_VERSION=$v" >> "$GITHUB_ENV"
           echo "APP_VERSION=$v"
 
@@ -94,7 +104,7 @@ jobs:
   build-windows-arm64:
     name: "Windows arm64"
     runs-on: windows-11-arm
-    if: ${{ github.event_name == 'push' || github.event.inputs.target_platform == 'all' || github.event.inputs.target_platform == 'windows-arm64' }}
+    if: ${{ github.event_name == 'push' || contains(github.event.inputs.target_platforms, 'all') || contains(github.event.inputs.target_platforms, 'windows-arm64') }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -102,7 +112,13 @@ jobs:
       - name: Resolve app version
         shell: bash
         run: |
-          v=$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | head -1 | cut -d+ -f1)
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            v="${{ github.event.inputs.version }}"
+            echo "version from workflow input override: $v"
+          else
+            v=$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | head -1 | cut -d+ -f1)
+            echo "version from pubspec.yaml: $v"
+          fi
           echo "APP_VERSION=$v" >> "$GITHUB_ENV"
           echo "APP_VERSION=$v"
 
@@ -121,11 +137,11 @@ jobs:
           Write-Host "Downloading native Windows ARM64 Dart SDK for version: $dartSemver"
           $zipPath = "$env:TEMP\dartsdk-windows-arm64.zip"
           Invoke-WebRequest -Uri "https://storage.googleapis.com/dart-archive/channels/stable/release/$dartSemver/sdk/dartsdk-windows-arm64-release.zip" -OutFile $zipPath
-          
+
           Remove-Item -Recurse -Force "$env:FLUTTER_ROOT\bin\cache\dart-sdk"
           Expand-Archive -Path $zipPath -DestinationPath "$env:FLUTTER_ROOT\bin\cache"
           Remove-Item -Force $zipPath
-          
+
           Remove-Item -Force "$env:FLUTTER_ROOT\bin\cache\flutter_tools.snapshot" -ErrorAction SilentlyContinue
           Remove-Item -Force "$env:FLUTTER_ROOT\bin\cache\flutter_tools.stamp" -ErrorAction SilentlyContinue
 
@@ -177,7 +193,7 @@ jobs:
   build-windows-x86:
     name: "Windows x86"
     runs-on: windows-latest
-    if: ${{ github.event_name == 'push' || github.event.inputs.target_platform == 'all' || github.event.inputs.target_platform == 'windows-x86' }}
+    if: ${{ github.event_name == 'push' || contains(github.event.inputs.target_platforms, 'all') || contains(github.event.inputs.target_platforms, 'windows-x86') }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -185,7 +201,13 @@ jobs:
       - name: Resolve app version
         shell: bash
         run: |
-          v=$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | head -1 | cut -d+ -f1)
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            v="${{ github.event.inputs.version }}"
+            echo "version from workflow input override: $v"
+          else
+            v=$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | head -1 | cut -d+ -f1)
+            echo "version from pubspec.yaml: $v"
+          fi
           echo "APP_VERSION=$v" >> "$GITHUB_ENV"
           echo "APP_VERSION=$v"
 
@@ -250,7 +272,7 @@ jobs:
   build-macos:
     name: "macOS"
     runs-on: macos-latest
-    if: ${{ github.event_name == 'push' || github.event.inputs.target_platform == 'all' || github.event.inputs.target_platform == 'macos' }}
+    if: ${{ github.event_name == 'push' || contains(github.event.inputs.target_platforms, 'all') || contains(github.event.inputs.target_platforms, 'macos') }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -258,7 +280,13 @@ jobs:
       - name: Resolve app version
         shell: bash
         run: |
-          v=$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | head -1 | cut -d+ -f1)
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            v="${{ github.event.inputs.version }}"
+            echo "version from workflow input override: $v"
+          else
+            v=$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | head -1 | cut -d+ -f1)
+            echo "version from pubspec.yaml: $v"
+          fi
           echo "APP_VERSION=$v" >> "$GITHUB_ENV"
           echo "APP_VERSION=$v"
 
@@ -303,7 +331,7 @@ jobs:
   build-linux-x64:
     name: "Linux x64"
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' || github.event.inputs.target_platform == 'all' || github.event.inputs.target_platform == 'linux-x64' }}
+    if: ${{ github.event_name == 'push' || contains(github.event.inputs.target_platforms, 'all') || contains(github.event.inputs.target_platforms, 'linux-x64') }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -311,7 +339,13 @@ jobs:
       - name: Resolve app version
         shell: bash
         run: |
-          v=$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | head -1 | cut -d+ -f1)
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            v="${{ github.event.inputs.version }}"
+            echo "version from workflow input override: $v"
+          else
+            v=$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | head -1 | cut -d+ -f1)
+            echo "version from pubspec.yaml: $v"
+          fi
           echo "APP_VERSION=$v" >> "$GITHUB_ENV"
           echo "APP_VERSION=$v"
 
@@ -375,7 +409,7 @@ jobs:
   build-linux-arm64:
     name: "Linux arm64"
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' || github.event.inputs.target_platform == 'all' || github.event.inputs.target_platform == 'linux-arm64' }}
+    if: ${{ github.event_name == 'push' || contains(github.event.inputs.target_platforms, 'all') || contains(github.event.inputs.target_platforms, 'linux-arm64') }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -383,7 +417,13 @@ jobs:
       - name: Resolve app version
         shell: bash
         run: |
-          v=$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | head -1 | cut -d+ -f1)
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            v="${{ github.event.inputs.version }}"
+            echo "version from workflow input override: $v"
+          else
+            v=$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | head -1 | cut -d+ -f1)
+            echo "version from pubspec.yaml: $v"
+          fi
           echo "APP_VERSION=$v" >> "$GITHUB_ENV"
           echo "APP_VERSION=$v"
 
