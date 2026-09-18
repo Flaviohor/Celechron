@@ -62,162 +62,153 @@ class OptionPage extends StatelessWidget {
             ),
             // 教务
             Obx(() => SliverToBoxAdapter(
-                    child: GlassCard(
-                  child: CupertinoListSection.insetGrouped(
-                    backgroundColor: Color(0x00000000),
-                    margin: _defaultMargin,
-                    additionalDividerMargin: 2,
-                    header: Container(
-                        padding: const EdgeInsets.only(left: 16),
-                        child: Text('教务', style: headerFooterTextStyle)),
-                    footer: (_optionController.pushOnGradeChange ||
-                                _optionController.pushOnDdlReminder) &&
-                            _optionController.scholar.value.isLogan
-                        ? Padding(
-                            padding: const EdgeInsets.only(left: 16),
-                            child: Text(
-                                'Celechron 将不定期自动运行以刷新数据。请开启通知权限，且不要将 Celechron 从后台中移除。',
-                                style: headerFooterTextStyle))
-                        : null,
-                    children: <CupertinoListTile>[
-                      if (_optionController.scholar.value.isLogan) ...{
-                        CupertinoListTile(
-                            title: Text(
-                                '已登录: ${_optionController.scholar.value.username}'),
-                            trailing: BackChervonRow(
-                                child: Text('退出',
-                                    style: TextStyle(
-                                        color: CupertinoDynamicColor.resolve(
-                                            CupertinoColors.secondaryLabel,
-                                            context),
-                                        fontSize: 16))),
-                            onTap: () async {
-                              await showCupertinoDialog(
-                                  context: context,
-                                  builder: (BuildContext dialogContext) {
-                                    return CupertinoAlertDialog(
-                                      title: const Text('退出登录'),
-                                      content: const Text('确定要退出当前账号吗？'),
-                                      actions: [
-                                        CupertinoDialogAction(
-                                          child: const Text('取消'),
-                                          onPressed: () {
-                                            Navigator.of(dialogContext).pop();
-                                          },
-                                        ),
-                                        CupertinoDialogAction(
-                                          isDestructiveAction: true,
-                                          child: const Text('退出'),
-                                          onPressed: () async {
-                                            Navigator.of(dialogContext).pop();
-                                            await _optionController.logout();
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  });
-                            }),
-                        CupertinoListTile(
-                          title: const Text('重修绩点计算'),
-                          trailing: CupertinoSlidingSegmentedControl(
-                            children: {
-                              GpaStrategy.first: Text('取首次',
-                                  style: CupertinoTheme.of(context)
-                                      .textTheme
-                                      .textStyle
-                                      .copyWith(fontSize: 16)),
-                              GpaStrategy.best: Text('取最高',
-                                  style: CupertinoTheme.of(context)
-                                      .textTheme
-                                      .textStyle
-                                      .copyWith(fontSize: 16)),
-                            },
-                            groupValue: _optionController.gpaStrategy,
-                            onValueChanged: (value) {
-                              _optionController.gpaStrategy = value!;
-                            },
-                          ),
-                        ),
-                        CupertinoListTile(
-                            title: const Text('隐藏绩点'),
-                            trailing: Obx(() => CupertinoSwitch(
-                                  value: _optionController.hideHomeGpa,
-                                  onChanged: (value) async {
-                                    _optionController.hideHomeGpa = value;
-                                  },
-                                ))),
-                        CupertinoListTile(
-                          title: const Text('自定义课程代码映射'),
-                          trailing: const BackChervonRow(),
+                    child: GlassListSection(
+                  additionalDividerMargin: 2,
+                  header: Container(
+                      padding: const EdgeInsets.only(left: 16),
+                      child: Text('教务', style: headerFooterTextStyle)),
+                  footer: (_optionController.pushOnGradeChange ||
+                              _optionController.pushOnDdlReminder) &&
+                          _optionController.scholar.value.isLogan
+                      ? Padding(
+                          padding: const EdgeInsets.only(left: 16),
+                          child: Text(
+                              'Celechron 将不定期自动运行以刷新数据。请开启通知权限，且不要将 Celechron 从后台中移除。',
+                              style: headerFooterTextStyle))
+                      : null,
+                  children: <CupertinoListTile>[
+                    if (_optionController.scholar.value.isLogan) ...{
+                      CupertinoListTile(
+                          title: Text(
+                              '已登录: ${_optionController.scholar.value.username}'),
+                          trailing: BackChervonRow(
+                              child: Text('退出',
+                                  style: TextStyle(
+                                      color: CupertinoDynamicColor.resolve(
+                                          CupertinoColors.secondaryLabel,
+                                          context),
+                                      fontSize: 16))),
                           onTap: () async {
-                            Navigator.of(context, rootNavigator: true).push(
-                                CupertinoPageRoute(
-                                    builder: (context) =>
-                                        CourseIdMappingEditPage()));
-                          },
-                        ),
-                        CupertinoListTile(
-                            title: const Text('异步刷新'),
-                            trailing: Obx(() => CupertinoSwitch(
-                                  value: _optionController.asyncRefresh,
-                                  onChanged: (value) async {
-                                    _optionController.asyncRefresh = value;
-                                  },
-                                ))),
-                        CupertinoListTile(
-                            title: const Text('推送成绩变动'),
-                            trailing: CupertinoSwitch(
-                              value: _optionController.pushOnGradeChange,
-                              onChanged: PlatformFeatures.hasBackgroundRefresh
-                                  ? (value) async {
-                                      _optionController.pushOnGradeChange =
-                                          value;
-                                    }
-                                  : null,
-                            )),
-                        CupertinoListTile(
-                            title: const Text('推送作业截止提醒'),
-                            trailing: CupertinoSwitch(
-                              value: _optionController.pushOnDdlReminder,
-                              onChanged: PlatformFeatures.hasBackgroundRefresh
-                                  ? (value) async {
-                                      _optionController.pushOnDdlReminder =
-                                          value;
-                                    }
-                                  : null,
-                            )),
-                      } else ...{
-                        CupertinoListTile(
-                          title: const Text('点击登录',
-                              style:
-                                  TextStyle(color: CupertinoColors.activeBlue)),
-                          trailing: const BackChervonRow(
-                            child: Text(''),
-                          ),
-                          onTap: () async {
-                            // Pop up a login widget from the bottom of the screen
-                            showCupertinoModalPopup(
+                            await showCupertinoDialog(
                                 context: context,
-                                builder: (BuildContext context) {
-                                  return LoginForm();
+                                builder: (BuildContext dialogContext) {
+                                  return CupertinoAlertDialog(
+                                    title: const Text('退出登录'),
+                                    content: const Text('确定要退出当前账号吗？'),
+                                    actions: [
+                                      CupertinoDialogAction(
+                                        child: const Text('取消'),
+                                        onPressed: () {
+                                          Navigator.of(dialogContext).pop();
+                                        },
+                                      ),
+                                      CupertinoDialogAction(
+                                        isDestructiveAction: true,
+                                        child: const Text('退出'),
+                                        onPressed: () async {
+                                          Navigator.of(dialogContext).pop();
+                                          await _optionController.logout();
+                                        },
+                                      ),
+                                    ],
+                                  );
                                 });
+                          }),
+                      CupertinoListTile(
+                        title: const Text('重修绩点计算'),
+                        trailing: CupertinoSlidingSegmentedControl(
+                          children: {
+                            GpaStrategy.first: Text('取首次',
+                                style: CupertinoTheme.of(context)
+                                    .textTheme
+                                    .textStyle
+                                    .copyWith(fontSize: 16)),
+                            GpaStrategy.best: Text('取最高',
+                                style: CupertinoTheme.of(context)
+                                    .textTheme
+                                    .textStyle
+                                    .copyWith(fontSize: 16)),
+                          },
+                          groupValue: _optionController.gpaStrategy,
+                          onValueChanged: (value) {
+                            _optionController.gpaStrategy = value!;
                           },
                         ),
-                      },
-                    ],
-                  ),
+                      ),
+                      CupertinoListTile(
+                          title: const Text('隐藏绩点'),
+                          trailing: Obx(() => CupertinoSwitch(
+                                value: _optionController.hideHomeGpa,
+                                onChanged: (value) async {
+                                  _optionController.hideHomeGpa = value;
+                                },
+                              ))),
+                      CupertinoListTile(
+                        title: const Text('自定义课程代码映射'),
+                        trailing: const BackChervonRow(),
+                        onTap: () async {
+                          Navigator.of(context, rootNavigator: true).push(
+                              CupertinoPageRoute(
+                                  builder: (context) =>
+                                      CourseIdMappingEditPage()));
+                        },
+                      ),
+                      CupertinoListTile(
+                          title: const Text('异步刷新'),
+                          trailing: Obx(() => CupertinoSwitch(
+                                value: _optionController.asyncRefresh,
+                                onChanged: (value) async {
+                                  _optionController.asyncRefresh = value;
+                                },
+                              ))),
+                      CupertinoListTile(
+                          title: const Text('推送成绩变动'),
+                          trailing: CupertinoSwitch(
+                            value: _optionController.pushOnGradeChange,
+                            onChanged: PlatformFeatures.hasBackgroundRefresh
+                                ? (value) async {
+                                    _optionController.pushOnGradeChange = value;
+                                  }
+                                : null,
+                          )),
+                      CupertinoListTile(
+                          title: const Text('推送作业截止提醒'),
+                          trailing: CupertinoSwitch(
+                            value: _optionController.pushOnDdlReminder,
+                            onChanged: PlatformFeatures.hasBackgroundRefresh
+                                ? (value) async {
+                                    _optionController.pushOnDdlReminder = value;
+                                  }
+                                : null,
+                          )),
+                    } else ...{
+                      CupertinoListTile(
+                        title: const Text('点击登录',
+                            style:
+                                TextStyle(color: CupertinoColors.activeBlue)),
+                        trailing: const BackChervonRow(
+                          child: Text(''),
+                        ),
+                        onTap: () async {
+                          // Pop up a login widget from the bottom of the screen
+                          showCupertinoModalPopup(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return LoginForm();
+                              });
+                        },
+                      ),
+                    },
+                  ],
                 ))),
             // 时间规划
             SliverToBoxAdapter(
-                child: GlassCard(
-                    child: CupertinoListSection.insetGrouped(
-                        backgroundColor: Color(0x00000000),
-                        additionalDividerMargin: 2,
-                        margin: _defaultMargin,
-                        header: Container(
-                            padding: const EdgeInsets.only(left: 16),
-                            child: Text('时间规划', style: headerFooterTextStyle)),
-                        children: <CupertinoListTile>[
+                child: GlassListSection(
+                    additionalDividerMargin: 2,
+                    header: Container(
+                        padding: const EdgeInsets.only(left: 16),
+                        child: Text('时间规划', style: headerFooterTextStyle)),
+                    children: <CupertinoListTile>[
                   CupertinoListTile(
                     title: const Text('工作段时间长度'),
                     trailing: BackChervonRow(
@@ -331,19 +322,15 @@ class OptionPage extends StatelessWidget {
                       ));
                     },
                   ),
-                ]))),
+                ])),
             // 日程
             Obx(() => SliverToBoxAdapter(
-                    child: GlassCard(
-                        child: CupertinoListSection.insetGrouped(
-                            backgroundColor: Color(0x00000000),
-                            additionalDividerMargin: 2,
-                            margin: _defaultMargin,
-                            header: Container(
-                                padding: const EdgeInsets.only(left: 16),
-                                child:
-                                    Text('日程', style: headerFooterTextStyle)),
-                            children: [
+                    child: GlassListSection(
+                        additionalDividerMargin: 2,
+                        header: Container(
+                            padding: const EdgeInsets.only(left: 16),
+                            child: Text('日程', style: headerFooterTextStyle)),
+                        children: [
                       // 系统日历读写由 device_calendar 提供，只有 Android / iOS
                       // 有实现。桌面端直接展示为不可用，并引导到 iCal 导出。
                       if (_optionController.systemCalendarAvailable)
@@ -411,18 +398,15 @@ class OptionPage extends StatelessWidget {
                         onTap: () =>
                             _optionController.showExportDialog(context),
                       ),
-                    ])))),
+                    ]))),
             // 工具
             SliverToBoxAdapter(
-                child: GlassCard(
-                    child: CupertinoListSection.insetGrouped(
-                        backgroundColor: Color(0x00000000),
-                        additionalDividerMargin: 2,
-                        margin: _defaultMargin,
-                        header: Container(
-                            padding: const EdgeInsets.only(left: 16),
-                            child: Text('工具', style: headerFooterTextStyle)),
-                        children: <Widget>[
+                child: GlassListSection(
+                    additionalDividerMargin: 2,
+                    header: Container(
+                        padding: const EdgeInsets.only(left: 16),
+                        child: Text('工具', style: headerFooterTextStyle)),
+                    children: <Widget>[
                   CupertinoListTile(
                     title: const Text('暗色模式'),
                     trailing: BackChervonRow(
@@ -446,14 +430,11 @@ class OptionPage extends StatelessWidget {
                           .pushNamed('/ecardpaypage');
                     },
                   ),
-                ]))),
-            // 关于
+                ])),
+            // 诊断与测试
             SliverToBoxAdapter(
-                child: GlassCard(
-              child: CupertinoListSection.insetGrouped(
-                backgroundColor: Color(0x00000000),
+              child: GlassListSection(
                 additionalDividerMargin: 2,
-                margin: _defaultMargin,
                 header: Container(
                   padding: const EdgeInsets.only(left: 16),
                   child: Text('诊断与测试', style: headerFooterTextStyle),
@@ -475,14 +456,11 @@ class OptionPage extends StatelessWidget {
                   ),
                 ],
               ),
-            )),
+            ),
             // 关于
             SliverToBoxAdapter(
-                child: GlassCard(
-              child: CupertinoListSection.insetGrouped(
-                  backgroundColor: Color(0x00000000),
+              child: GlassListSection(
                   additionalDividerMargin: 2,
-                  margin: _defaultMargin,
                   header: Container(
                       padding: const EdgeInsets.only(left: 16),
                       child: Text('关于', style: headerFooterTextStyle)),
@@ -540,7 +518,7 @@ class OptionPage extends StatelessWidget {
                       },
                     ),
                   ]),
-            ))
+            )
           ],
         )));
   }
@@ -581,9 +559,6 @@ class OptionPage extends StatelessWidget {
       },
     );
   }
-
-  static const _defaultMargin =
-      EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 10.0);
 }
 
 class BackChervonRow extends StatelessWidget {

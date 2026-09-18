@@ -22,6 +22,44 @@ import 'package:celechron/worker/ecard_widget_messenger.dart';
 import 'package:celechron/database/database_helper.dart';
 import 'package:celechron/utils/global.dart';
 
+/// 全局字体 family 名，对应 `pubspec.yaml` 里声明的 Noto Sans SC 可变字体。
+///
+/// 苹方（PingFang）是苹果的商用字体：Windows 上没有预装，也不能随应用分发，
+/// 所以这里用观感接近、可自由分发的 Noto Sans SC（可变字体，单文件覆盖
+/// bold / w600 / w500 / normal 等全部字重）。
+const String kAppFontFamily = 'NotoSansSC';
+
+/// 套上全局字体的 Cupertino 文本主题。
+///
+/// Cupertino **没有**「一处设置、全局生效」的字体入口：
+///   * [CupertinoThemeData] 根本没有 `fontFamily` 参数；
+///   * [CupertinoTextThemeData] 也没有，它的默认样式把 fontFamily 写死成
+///     `CupertinoSystemText`，而且是 `inherit: false`——所以单纯改
+///     [DefaultTextStyle] 覆盖不到「用了主题样式」的那些文字。
+///
+/// 因此只能逐个样式 `copyWith` 覆盖字体；其余属性（字号、字重、颜色、
+/// letterSpacing）全部沿用系统默认，观感与原生一致。
+CupertinoTextThemeData _appTextTheme() {
+  final CupertinoTextThemeData base = const CupertinoTextThemeData();
+  return CupertinoTextThemeData(
+    textStyle: base.textStyle.copyWith(fontFamily: kAppFontFamily),
+    actionTextStyle: base.actionTextStyle.copyWith(fontFamily: kAppFontFamily),
+    actionSmallTextStyle:
+        base.actionSmallTextStyle.copyWith(fontFamily: kAppFontFamily),
+    tabLabelTextStyle:
+        base.tabLabelTextStyle.copyWith(fontFamily: kAppFontFamily),
+    navTitleTextStyle:
+        base.navTitleTextStyle.copyWith(fontFamily: kAppFontFamily),
+    navLargeTitleTextStyle:
+        base.navLargeTitleTextStyle.copyWith(fontFamily: kAppFontFamily),
+    navActionTextStyle:
+        base.navActionTextStyle.copyWith(fontFamily: kAppFontFamily),
+    pickerTextStyle: base.pickerTextStyle.copyWith(fontFamily: kAppFontFamily),
+    dateTimePickerTextStyle:
+        base.dateTimePickerTextStyle.copyWith(fontFamily: kAppFontFamily),
+  );
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   ECardWidgetMessenger.installNativeHandler();
@@ -179,6 +217,9 @@ class _CelechronAppState extends State<CelechronApp>
                 : brightnessMode.value == BrightnessMode.dark
                     ? Brightness.dark
                     : Brightness.light,
+            // 全局字体：Cupertino 没有 fontFamily 入口，只能逐样式覆盖，
+            // 详见 _appTextTheme 的注释。
+            textTheme: _appTextTheme(),
             scaffoldBackgroundColor: CupertinoColors.systemBackground,
             barBackgroundColor: CupertinoColors.systemBackground,
           ),
@@ -192,9 +233,15 @@ class _CelechronAppState extends State<CelechronApp>
             Locale('en'),
           ],
           locale: const Locale('zh'),
-          builder: (context, child) => MediaQuery(
-            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-            child: child!,
+          builder: (context, child) => DefaultTextStyle.merge(
+            // 兜底一层：让所有「没写死 fontFamily 且 inherit: true」的样式
+            // （例如各处 TextStyle(fontWeight: FontWeight.bold)）也继承到全局字体。
+            style: const TextStyle(fontFamily: kAppFontFamily),
+            child: MediaQuery(
+              data:
+                  MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+              child: child!,
+            ),
           ),
           title: 'Celechron',
           home: const HomePage(title: 'Celechron'),

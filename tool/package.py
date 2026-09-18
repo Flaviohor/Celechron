@@ -21,7 +21,7 @@ BUILD = ROOT / "build" / "windows" / "x64" / "runner" / "Release"
 DIST = ROOT / "dist"
 
 APP_NAME = "Celechron"
-APP_VERSION = "1.3.1"
+APP_VERSION = "1.3.2"
 
 # 需要的 CRT 文件（app-local 部署）
 CRT_FILES = [

@@ -591,7 +591,7 @@ class FlowPage extends StatelessWidget {
                   CupertinoButton(
                     padding: EdgeInsets.zero,
                     child: const Icon(
-                      CupertinoIcons.refresh_circled,
+                      CupertinoIcons.add_circled,
                       semanticLabel: 'Add',
                     ),
                     onPressed: () async {

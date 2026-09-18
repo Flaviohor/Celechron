@@ -12,6 +12,7 @@ import 'package:get/get.dart';
 import 'package:celechron/design/multiple_columns.dart';
 import 'package:celechron/design/two_line_card.dart';
 import 'package:celechron/design/round_rectangle_card.dart';
+import 'package:celechron/design/glass.dart';
 import 'package:celechron/design/custom_colors.dart';
 import 'package:celechron/design/animate_button.dart';
 import 'package:celechron/design/refresh_status_indicator.dart';
@@ -763,24 +764,8 @@ class ScholarPage extends StatelessWidget {
             PlatformFeatures.isDesktop ? const Color(0x00000000) : null,
         child: CustomScrollView(
           slivers: [
-            SliverPinnedToBoxAdapter(
-                child: Container(
-              decoration: BoxDecoration(
-                color: CupertinoDynamicColor.resolve(
-                    CupertinoColors.systemBackground, context),
-                /*boxShadow: [
-              BoxShadow(
-                color: CupertinoDynamicColor.resolve(
-                    CupertinoColors.systemGrey5, context),
-                offset: const Offset(0, 0),
-                blurRadius: 4,
-              ),
-            ],
-            borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(16),
-                bottomRight: Radius.circular(16)),*/
-              ),
-              child: Padding(
+            SliverPinnedToBoxAdapter(child: Builder(builder: (context) {
+              final Widget topBarInner = Padding(
                   padding: EdgeInsets.only(
                       left: 16,
                       right: 16,
@@ -958,8 +943,17 @@ class ScholarPage extends StatelessWidget {
                           CupertinoColors.separator, context),
                       height: 14,
                     ),
-                  ])),
-            )),
+                  ]));
+              return PlatformFeatures.isDesktop
+                  ? Glass.bar(child: topBarInner)
+                  : Container(
+                      decoration: BoxDecoration(
+                        color: CupertinoDynamicColor.resolve(
+                            CupertinoColors.systemBackground, context),
+                      ),
+                      child: topBarInner,
+                    );
+            })),
             if (_scholarController.scholar.isLogan)
               CupertinoSliverRefreshControl(
                 // 复刻原生转圈，刷新超过 5 秒后在其右侧滚动展示状态文案。

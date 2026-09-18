@@ -4,6 +4,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart' show PointerHoverEvent, PointerMoveEvent;
 
+import 'package:celechron/utils/platform_features.dart';
+
 /// 桌面端的「液态玻璃 / 沉浸光感」工具组件。
 ///
 /// 与早期版本（只有「模糊 + 均匀 1px 白边」）相比，这里补上了玻璃真正
@@ -640,6 +642,110 @@ class GlassCard extends StatelessWidget {
         ),
       ],
       child: child,
+    );
+  }
+}
+
+/// 桌面端的分组列表：`header / 玻璃块 / footer` 三段式。
+///
+/// 为什么需要它：`CupertinoListSection.insetGrouped` 会把自己那块行组画成
+/// **不透明的** `secondarySystemGroupedBackground`（深色 #1C1C1E、浅色纯白），
+/// 而且这个底色**不受** `backgroundColor` 参数影响 —— 后者只画在最外层容器上。
+/// 于是就算外面套了液态玻璃，行组依旧是一块死色块，把模糊层整个盖住，
+/// 看起来就像「玻璃框里嵌了一块塑料板」。
+///
+/// 这里把行组本身变成玻璃：
+///   * 行组外面套 [GlassSurface]（模糊 + 受光描边 + 顶部高光 + 悬浮阴影）；
+///   * 行组自己的装饰色改成半透明，让下层的模糊透上来；
+///   * 玻璃圆角与内容裁剪半径都取 10（`insetGrouped` 的原生圆角），
+///     否则圆角处会露出一条没被裁掉的夹层。
+///
+/// header / footer 留在玻璃**外面**，直接坐在窗口背景上 —— 这也是 iOS 把
+/// 分组列表铺在壁纸上的样子，顺便省掉「玻璃里再套一层玻璃」的双层描边。
+/// header / footer 的边距沿用原生 `insetGrouped` 的数值，所以排版和原来一致。
+///
+/// 移动端直接走原生 [CupertinoListSection.insetGrouped]，行为零变化。
+class GlassListSection extends StatelessWidget {
+  const GlassListSection({
+    super.key,
+    required this.children,
+    this.header,
+    this.footer,
+    this.additionalDividerMargin = 2,
+    this.margin = const EdgeInsetsDirectional.fromSTEB(16, 0, 16, 10),
+  });
+
+  final List<Widget> children;
+  final Widget? header;
+  final Widget? footer;
+  final double additionalDividerMargin;
+
+  /// 玻璃块相对容器左右两侧的留白（原来那层玻璃面板的 `_defaultMargin`）。
+  final EdgeInsetsGeometry margin;
+
+  /// `insetGrouped` 的原生圆角；玻璃和内容裁剪都用它。
+  static const BorderRadius _kRadius = BorderRadius.all(Radius.circular(10));
+
+  // 下面两个沿用 list_section.dart 里的私有常量，保证 header/footer 落点不变。
+  static const EdgeInsetsDirectional _kHeaderMargin =
+      EdgeInsetsDirectional.fromSTEB(20, 16, 20, 6);
+  static const EdgeInsetsDirectional _kFooterMargin =
+      EdgeInsetsDirectional.fromSTEB(20, 0, 20, 10);
+
+  @override
+  Widget build(BuildContext context) {
+    if (!PlatformFeatures.isDesktop) {
+      return CupertinoListSection.insetGrouped(
+        margin: margin,
+        additionalDividerMargin: additionalDividerMargin,
+        header: header,
+        footer: footer,
+        children: children,
+      );
+    }
+
+    final bool isDark = CupertinoTheme.brightnessOf(context) == Brightness.dark;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        if (header != null) Padding(padding: _kHeaderMargin, child: header!),
+        GlassSurface(
+          borderRadius: _kRadius,
+          margin: margin,
+          // tint 由行组自己画（见下面 decoration），这里只出模糊和棱边。
+          tintOpacity: 0,
+          borderOpacity: 0.22,
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color:
+                  CupertinoColors.black.withValues(alpha: isDark ? 0.26 : 0.08),
+              blurRadius: 28,
+              spreadRadius: -8,
+              offset: const Offset(0, 10),
+            ),
+            BoxShadow(
+              color:
+                  CupertinoColors.black.withValues(alpha: isDark ? 0.14 : 0.04),
+              blurRadius: 7,
+              spreadRadius: -2,
+              offset: const Offset(0, 2),
+            ),
+          ],
+          child: CupertinoListSection.insetGrouped(
+            backgroundColor: const Color(0x00000000),
+            margin: EdgeInsets.zero,
+            additionalDividerMargin: additionalDividerMargin,
+            decoration: BoxDecoration(
+              color: CupertinoColors.white
+                  .withValues(alpha: isDark ? 0.045 : 0.30),
+              borderRadius: _kRadius,
+            ),
+            children: children,
+          ),
+        ),
+        if (footer != null) Padding(padding: _kFooterMargin, child: footer!),
+      ],
     );
   }
 }

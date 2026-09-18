@@ -33,7 +33,7 @@ SEVENZIP_DLL = SEVENZIP_DIR / "7z.dll"
 IEXPRESS = Path(r"C:\Windows\System32\iexpress.exe")
 
 APP_NAME = "Celechron"
-APP_VERSION = "1.3.1"
+APP_VERSION = "1.3.2"
 PACK_NAME = "celechron-iexpress-stage"
 SETUP_BASENAME = f"{APP_NAME}-{APP_VERSION}-windows-x64-setup"
 
@@ -159,6 +159,12 @@ try {
   Fail ($_.Exception.Message)
 }
 """
+
+# install.ps1 里的 $version 原来写死成 '1.3.0'，1.3.1 发布时漏改，
+# 导致装出来的 1.3.1 在「应用和功能」里登记的还是 1.3.0。
+# 这里统一由 APP_VERSION 注入，版本号只维护一处。
+INSTALL_PS1 = INSTALL_PS1.replace("$version = '1.3.0'", "$version = '" + APP_VERSION + "'")
+assert "$version = '" + APP_VERSION + "'" in INSTALL_PS1, "版本号注入失败"
 
 # --------------------------------------------------------------------------
 # uninstall.ps1

@@ -12,12 +12,19 @@ class RoundRectangleCard extends StatefulWidget {
   final List<BoxShadow> boxShadow;
   final EdgeInsets padding;
 
+  /// 桌面端是否用液态玻璃铺底。
+  ///
+  /// false = 桌面端不铺底、不做模糊，留给外层统一做一整块玻璃
+  /// （见 [RoundRectangleCardWithForehead]）。移动端不受影响，始终是实心卡片。
+  final bool useGlass;
+
   const RoundRectangleCard({
     super.key,
     required this.child,
     this.onTap,
     this.animate = true,
     this.padding = const EdgeInsets.all(12),
+    this.useGlass = true,
     this.boxShadow = const [
       BoxShadow(
         color: CupertinoColors.systemGrey5,
@@ -75,7 +82,11 @@ class _RoundRectangleCardState extends State<RoundRectangleCard>
     // 改成半透明 tint + 背景模糊，让窗口底色里的色斑与随指针走的柔光透上来。
     // 移动端保持原来的实心卡片（玻璃是桌面端专属的观感处理）。
     late final Widget core;
-    if (PlatformFeatures.isDesktop) {
+    if (PlatformFeatures.isDesktop && !widget.useGlass) {
+      // 外层已经是一整块玻璃，这里只负责内边距和点击动画，
+      // 不再铺底、不再二次模糊。
+      core = Container(padding: widget.padding, child: widget.child);
+    } else if (PlatformFeatures.isDesktop) {
       final List<BoxShadow>? shadows = widget.boxShadow.isEmpty
           ? const <BoxShadow>[]
           : (isDark ? null : widget.boxShadow);
@@ -149,17 +160,36 @@ class RoundRectangleCardWithForehead extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Color resolved =
+        CupertinoDynamicColor.resolve(foreheadColor, context);
+    // 桌面端：把整张卡做成一整块「带主题色的玻璃」，而不是一层实色底
+    // 再叠一层玻璃——那样额头和内容会分成两层，看着割裂。
+    // 移动端：保持原来的实色额头。
+    final bool glass = PlatformFeatures.isDesktop;
     return Stack(
       children: [
         Positioned.fill(
-            child: SizedBox(
-                child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: CupertinoDynamicColor.resolve(foreheadColor, context),
-            boxShadow: const [],
-          ),
-        ))),
+          child: glass
+              ? GlassSurface(
+                  sigma: 16,
+                  borderRadius: BorderRadius.circular(12),
+                  // 传入的 foreheadColor 自带 alpha（一般 0.25），
+                  // 直接当 tint 会被叠成很淡的一层，所以先把 alpha 拉满，
+                  // 再由 tintOpacity 统一控制浓度。
+                  tint: resolved.withValues(alpha: 1.0),
+                  tintOpacity: 0.20,
+                  borderOpacity: 0.22,
+                  boxShadow: const <BoxShadow>[],
+                  child: const SizedBox.expand(),
+                )
+              : Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: resolved,
+                    boxShadow: const [],
+                  ),
+                ),
+        ),
         SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -170,6 +200,7 @@ class RoundRectangleCardWithForehead extends StatelessWidget {
                 onTap: onTap,
                 animate: animate,
                 boxShadow: const [],
+                useGlass: false,
                 child: child,
               ),
             ],
