@@ -174,7 +174,7 @@ class _CreditsPageState extends State<CreditsPage> {
                       Column(
                         children: [
                           const Text(
-                            'PCelechron',
+                            'Pcelechron',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 32,
@@ -189,7 +189,7 @@ class _CreditsPageState extends State<CreditsPage> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Celechron的PC版本构建，目前已支持Windows/Mac OS，基于上游1.3.0，\n有任何问题请到项目仓库反馈',
+                            'Celechron的PC版本构建，目前已支持Windows/Mac OS，基于上游1.3.3，\n有任何问题请到项目仓库反馈，\n目前应用图标仅为临时占位作用，如系侵权请在GitHub上联系作者更换',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 12,

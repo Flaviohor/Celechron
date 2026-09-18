@@ -76,17 +76,16 @@ cd /e/celechron-windows
 ## 三之二、打包分发
 
 ```bash
-python tool/subset_fonts.py    # 可选：把 fonts/HarmonyOS_Sans_*.ttf 子集化（47MB -> 1.7MB）
 python tool/package.py         # 便携版：dist/Celechron-<ver>-windows-x64/ + portable.zip
 python tool/make_installer.py  # 单文件安装器：dist/Celechron-<ver>-windows-x64-setup.exe
 ```
 
-> **字体子集化。** 6 个 HarmonyOS Sans SC 字重原始 ~8MB × 6 ≈ 47MB，
-> 子集化（基于项目实际用到的 ~1500 个字符 + 一份安全垫）后单字重 ~290KB，
-> 总共 ~1.7MB。备份自动落在 `fonts/_unsorted.bak/`（脚本已自动加入 `.gitignore`）。
-> 只需跑一次，结果存盘后下次跳过 —— 但 **新增 UI 字符串 / 改语言文案后需要重跑**
-> 否则新加的字会掉成豆腐块。脚本会输出 `build/font-chars.txt` 报告当前字符集，
-> 适合提交 PR 时一并 review。
+> **字体。** 当前用 `assets/fonts/NotoSansSC-VF.ttf`（Noto Sans SC 可变字体，
+> 单文件 ~17 MB），不做子集化。`tool/subset_fonts.py` 还在仓库里作
+> 为可选工具，未来若想压缩体积可以再启用。
+
+> 安装器未做代码签名，首次运行会被 SmartScreen 拦（点「更多信息 → 仍要运行」）。
+> 详见第八节「代码签名：不花钱能做什么」。
 
 > 安装器未做代码签名，首次运行会被 SmartScreen 拦（点「更多信息 → 仍要运行」）。
 > 详见第八节「代码签名：不花钱能做什么」。
