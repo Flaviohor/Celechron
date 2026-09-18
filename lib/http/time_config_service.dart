@@ -1,12 +1,12 @@
 import 'dart:io';
 
-import 'package:celechron/database/database_helper.dart';
-import 'package:celechron/http/calendar_config_parser.dart';
-import 'package:celechron/http/data_source_status.dart';
-import 'package:celechron/http/zjuServices/exceptions.dart';
-import 'package:celechron/http/zjuServices/response_utils.dart';
-import 'package:celechron/services/diagnostic_log_service.dart';
-import 'package:celechron/utils/tuple.dart';
+import 'package:pcelechron/database/database_helper.dart';
+import 'package:pcelechron/http/calendar_config_parser.dart';
+import 'package:pcelechron/http/data_source_status.dart';
+import 'package:pcelechron/http/zjuServices/exceptions.dart';
+import 'package:pcelechron/http/zjuServices/response_utils.dart';
+import 'package:pcelechron/services/diagnostic_log_service.dart';
+import 'package:pcelechron/utils/tuple.dart';
 import 'package:flutter/foundation.dart';
 
 /// 获取并校验学期校历；远程不可用时按“同学期缓存、推算配置”顺序降级。

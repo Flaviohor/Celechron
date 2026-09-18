@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:celechron/utils/json_utils.dart';
-import 'package:celechron/services/diagnostic_log_service.dart';
+import 'package:pcelechron/utils/json_utils.dart';
+import 'package:pcelechron/services/diagnostic_log_service.dart';
 
 import 'exceptions.dart';
 
-export 'package:celechron/utils/json_utils.dart';
+export 'package:pcelechron/utils/json_utils.dart';
 
 String responseSummary(String body) {
   // 诊断摘要禁止复制业务正文，只保留定位格式问题所需的结构信息。

@@ -3,17 +3,17 @@ import 'dart:async';
 import 'package:get/get.dart';
 import 'package:flutter/cupertino.dart';
 
-import 'package:celechron/model/scholar.dart';
-import 'package:celechron/model/option.dart';
-import 'package:celechron/database/database_helper.dart';
-import 'package:celechron/worker/ecard_widget_messenger.dart';
-import 'package:celechron/worker/fuse.dart';
-import 'package:celechron/worker/background_refresh.dart';
-import 'package:celechron/utils/platform_features.dart';
-import 'package:celechron/model/calendar_to_system.dart';
-import 'package:celechron/model/calendar_to_ical.dart';
+import 'package:pcelechron/model/scholar.dart';
+import 'package:pcelechron/model/option.dart';
+import 'package:pcelechron/database/database_helper.dart';
+import 'package:pcelechron/worker/ecard_widget_messenger.dart';
+import 'package:pcelechron/worker/fuse.dart';
+import 'package:pcelechron/worker/background_refresh.dart';
+import 'package:pcelechron/utils/platform_features.dart';
+import 'package:pcelechron/model/calendar_to_system.dart';
+import 'package:pcelechron/model/calendar_to_ical.dart';
 
-import 'package:celechron/utils/utils.dart';
+import 'package:pcelechron/utils/utils.dart';
 
 class OptionController extends GetxController {
   final _option = Get.find<Option>(tag: 'option');

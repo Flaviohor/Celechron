@@ -1,6 +1,6 @@
-import 'package:celechron/model/practice_score_item.dart';
-import 'package:celechron/model/scholar.dart';
-import 'package:celechron/page/scholar/practice_score/practice_score_page.dart';
+import 'package:pcelechron/model/practice_score_item.dart';
+import 'package:pcelechron/model/scholar.dart';
+import 'package:pcelechron/page/scholar/practice_score/practice_score_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 

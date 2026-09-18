@@ -1,4 +1,4 @@
-# Celechron → Windows 移植说明
+# Pcelechron → Windows 移植说明
 
 把 [Celechron/Celechron](https://github.com/Celechron/Celechron)（浙大教务 App，Flutter）移植到 Windows 桌面端。
 
@@ -19,10 +19,10 @@
 | `flutter build windows --debug` | ✅ 编译成功 |
 | `flutter build windows`（release） | ✅ 编译成功 |
 | 运行时实测 | ✅ 启动稳定、登录成功、数据抓取正常（结论见下） |
-| 便携版 zip | ✅ `dist/Celechron-1.3.0-windows-x64-portable.zip`（14.2 MB） |
-| 单文件安装器 | ✅ `dist/Celechron-1.3.0-windows-x64-setup.exe`（11.2 MB，已实测安装） |
+| 便携版 zip | ✅ `dist/Pcelechron-1.3.0-windows-x64-portable.zip`（14.2 MB） |
+| 单文件安装器 | ✅ `dist/Pcelechron-1.3.0-windows-x64-setup.exe`（11.2 MB，已实测安装） |
 
-Release 包结构完整：`Celechron.exe`、`flutter_windows.dll`（引擎 21MB）、
+Release 包结构完整：`Pcelechron.exe`、`flutter_windows.dll`（引擎 21MB）、
 6 个插件 DLL、`data/app.so`（AOT 快照 8.4MB）、`data/icudtl.dat`、`data/flutter_assets/`。
 
 ### 运行时实测结论
@@ -69,20 +69,20 @@ cd /e/celechron-windows
 ./tool/run.sh              # 直接跑（调试）
 ```
 
-产物：`build/windows/x64/runner/Release/Celechron.exe`
+产物：`build/windows/x64/runner/Release/Pcelechron.exe`
 
 脚本会自动做三件事：加载环境变量、生成插件链接、调用 flutter。
 
 ## 三之二、打包分发
 
 ```bash
-python tool/package.py         # 便携版：dist/Celechron-<ver>-windows-x64/ + portable.zip
-python tool/make_installer.py  # 单文件安装器：dist/Celechron-<ver>-windows-x64-setup.exe
+python tool/package.py         # 便携版：dist/Pcelechron-<ver>-windows-x64/ + portable.zip
+python tool/make_installer.py  # 单文件安装器：dist/Pcelechron-<ver>-windows-x64-setup.exe
 ```
 
 ### 便携版（zip）
 
-解压即用，无需安装、无需管理员。**自带 VC++ 运行时**——`Celechron.exe` 依赖
+解压即用，无需安装、无需管理员。**自带 VC++ 运行时**——`Pcelechron.exe` 依赖
 `MSVCP140.dll` / `VCRUNTIME140.dll`（用 `dumpbin /dependents` 确认过），干净机器上
 没装 VC++ 可再发行包会直接启动失败。所以从 VS 的可再发行目录取官方 CRT 文件做
 app-local 部署（微软官方支持的方式），包内自带，不依赖装机环境。
@@ -96,16 +96,16 @@ app-local 部署（微软官方支持的方式），包内自带，不依赖装�
 结构（IExpress 包内**保持扁平、不放子目录**，因为 IExpress 对子目录支持不可靠）：
 
 ```
-Celechron-1.3.0-windows-x64-setup.exe
+Pcelechron-1.3.0-windows-x64-setup.exe
   └─ 自解压到临时目录后执行 install.cmd
-       ├─ Celechron.7z    整个应用（含 CRT）
+       ├─ Pcelechron.7z    整个应用（含 CRT）
        ├─ 7z.exe / 7z.dll 解压用
        ├─ install.cmd     ASCII 入口，转调 PowerShell
        ├─ install.ps1     安装逻辑（UTF-8 BOM 保存，才能写中文）
        └─ uninstall.ps1   卸载逻辑
 ```
 
-安装动作：解压到 `%LOCALAPPDATA%\Programs\Celechron`（按用户安装，不弹 UAC）→
+安装动作：解压到 `%LOCALAPPDATA%\Programs\Pcelechron`（按用户安装，不弹 UAC）→
 创建开始菜单和桌面快捷方式 → 注册 `celechron://` 协议到 `HKCU\Software\Classes` →
 在「应用和功能」里注册卸载项 → 启动应用。
 
@@ -113,7 +113,7 @@ Celechron-1.3.0-windows-x64-setup.exe
 副本删除安装目录（避免脚本删自己所在目录）。**用户数据不删**，只在结束时告知位置。
 
 实测安装结果：28 个文件 / 32.7MB，快捷方式指向正确，协议命令
-`"...\Celechron.exe" "%1"` 正确，卸载项字段完整，安装后的程序能正常启动。
+`"...\Pcelechron.exe" "%1"` 正确，卸载项字段完整，安装后的程序能正常启动。
 
 > 两个坑：`$env:APPDATA` 在某些执行环境下会是**空值**（`$env:LOCALAPPDATA` 却正常），
 > 所以脚本里一律改用 `[Environment]::GetFolderPath()` 取目录，它走 Shell API 不受影响。
@@ -212,7 +212,7 @@ Win10 RS5+ / Win11）。
 
 `windows/runner/Runner.rc` 原本还是 Flutter 模板占位值（`CompanyName = org.cc`、
 `ProductName = celechron`、`FileDescription = celechron`）。已对齐为
-`Celechron` / `Celechron - 课程表与学业助手`，翻译代码页从 1252 改成 1200(Unicode)
+`Pcelechron` / `Pcelechron - 课程表与学业助手`，翻译代码页从 1252 改成 1200(Unicode)
 以支持中文。模板里本来就有 `#pragma code_page(65001)`，所以 `.rc` 写中文不会乱码。
 
 ---
@@ -372,7 +372,7 @@ pub 包全走国内镜像，实测 0.7MB/s。GitHub 只在 git 依赖那一步�
    于是 7 个 `.hive` 文件直接摊在文档根目录下。Android/iOS 上这个目录是应用私有的，
    原作者不必在意；Windows 上就显得脏。
    **建议改法**：改用 `getApplicationSupportDirectory()`
-   （`%APPDATA%\Celechron\Celechron`）并做一次性迁移。
+   （`%APPDATA%\Pcelechron\Pcelechron`）并做一次性迁移。
    本次没动 —— 它会移动你已经产生的数据文件，属于需要你确认的改动。
 
 3. **后台刷新在桌面端是应用内定时器。** 应用没运行就不会刷新，成绩推送 /

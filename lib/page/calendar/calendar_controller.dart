@@ -1,10 +1,10 @@
-import 'package:celechron/model/task.dart';
-import 'package:celechron/utils/utils.dart';
+import 'package:pcelechron/model/task.dart';
+import 'package:pcelechron/utils/utils.dart';
 import 'package:get/get.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:celechron/model/period.dart';
-import 'package:celechron/model/scholar.dart';
-import 'package:celechron/model/semester.dart';
+import 'package:pcelechron/model/period.dart';
+import 'package:pcelechron/model/scholar.dart';
+import 'package:pcelechron/model/semester.dart';
 
 enum CalendarViewMode {
   calendar,

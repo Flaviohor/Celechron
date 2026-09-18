@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:celechron/http/zjuServices/exceptions.dart';
-import 'package:celechron/http/zjuServices/response_utils.dart';
-import 'package:celechron/utils/tuple.dart';
+import 'package:pcelechron/http/zjuServices/exceptions.dart';
+import 'package:pcelechron/http/zjuServices/response_utils.dart';
+import 'package:pcelechron/utils/tuple.dart';
 
 class GitHubService {
   // 默认作者名单

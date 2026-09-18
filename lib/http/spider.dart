@@ -1,9 +1,9 @@
-import 'package:celechron/database/database_helper.dart';
-import 'package:celechron/utils/tuple.dart';
+import 'package:pcelechron/database/database_helper.dart';
+import 'package:pcelechron/utils/tuple.dart';
 
-import 'package:celechron/model/grade.dart';
-import 'package:celechron/model/semester.dart';
-import 'package:celechron/model/todo.dart';
+import 'package:pcelechron/model/grade.dart';
+import 'package:pcelechron/model/semester.dart';
+import 'package:pcelechron/model/todo.dart';
 
 /// getEverything 的返回值：登录错误、抓取错误、学期、成绩、主修成绩、特殊日期、作业
 typedef EverythingTuple = Tuple7<List<String?>, List<String?>, List<Semester>,

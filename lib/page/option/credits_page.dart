@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
-import 'package:celechron/design/persistent_headers.dart';
-import 'package:celechron/http/github_service.dart';
+import 'package:pcelechron/design/persistent_headers.dart';
+import 'package:pcelechron/http/github_service.dart';
 
 class CreditsPage extends StatefulWidget {
   final String version;
@@ -174,7 +174,7 @@ class _CreditsPageState extends State<CreditsPage> {
                       Column(
                         children: [
                           const Text(
-                            'Celechron',
+                            'Pcelechron',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 32,

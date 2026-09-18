@@ -1,5 +1,5 @@
-import 'package:celechron/utils/time_helper.dart';
-import 'package:celechron/utils/json_utils.dart';
+import 'package:pcelechron/utils/time_helper.dart';
+import 'package:pcelechron/utils/json_utils.dart';
 
 class Exam {
   String id;

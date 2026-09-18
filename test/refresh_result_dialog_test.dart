@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:celechron/page/scholar/scholar_view.dart';
+import 'package:pcelechron/page/scholar/scholar_view.dart';
 
 void main() {
   Widget testApp(List<String?> results) {

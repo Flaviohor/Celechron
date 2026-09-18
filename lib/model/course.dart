@@ -1,5 +1,5 @@
-import 'package:celechron/model/exams_dto.dart';
-import 'package:celechron/utils/json_utils.dart';
+import 'package:pcelechron/model/exams_dto.dart';
+import 'package:pcelechron/utils/json_utils.dart';
 
 import 'exam.dart';
 import 'grade.dart';

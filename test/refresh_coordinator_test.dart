@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:celechron/http/zjuServices/exceptions.dart';
-import 'package:celechron/services/diagnostic_log_service.dart';
-import 'package:celechron/services/diagnostic_report.dart';
-import 'package:celechron/services/refresh_coordinator.dart';
+import 'package:pcelechron/http/zjuServices/exceptions.dart';
+import 'package:pcelechron/services/diagnostic_log_service.dart';
+import 'package:pcelechron/services/diagnostic_report.dart';
+import 'package:pcelechron/services/refresh_coordinator.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter_test/flutter_test.dart';
 

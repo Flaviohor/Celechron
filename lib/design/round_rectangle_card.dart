@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 
-import 'package:celechron/design/glass.dart';
-import 'package:celechron/utils/platform_features.dart';
+import 'package:pcelechron/design/glass.dart';
+import 'package:pcelechron/utils/platform_features.dart';
 
 class RoundRectangleCard extends StatefulWidget {
   final Widget child;

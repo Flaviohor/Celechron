@@ -5,22 +5,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:celechron/services/notification_service.dart';
+import 'package:pcelechron/services/notification_service.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:app_links/app_links.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'package:celechron/model/scholar.dart';
-import 'package:celechron/model/option.dart';
-import 'package:celechron/page/home_page.dart';
-import 'package:celechron/page/option/ecard_pay_page.dart';
-import 'package:celechron/services/diagnostic_log_service.dart';
-import 'package:celechron/services/refresh_coordinator.dart';
-import 'package:celechron/worker/ecard_widget_messenger.dart';
-import 'package:celechron/database/database_helper.dart';
-import 'package:celechron/utils/global.dart';
+import 'package:pcelechron/model/scholar.dart';
+import 'package:pcelechron/model/option.dart';
+import 'package:pcelechron/page/home_page.dart';
+import 'package:pcelechron/page/option/ecard_pay_page.dart';
+import 'package:pcelechron/services/diagnostic_log_service.dart';
+import 'package:pcelechron/services/refresh_coordinator.dart';
+import 'package:pcelechron/worker/ecard_widget_messenger.dart';
+import 'package:pcelechron/database/database_helper.dart';
+import 'package:pcelechron/utils/global.dart';
 
 /// 全局字体 family 名，对应 `pubspec.yaml` 里声明的 Noto Sans SC 可变字体。
 ///
@@ -243,8 +243,8 @@ class _CelechronAppState extends State<CelechronApp>
               child: child!,
             ),
           ),
-          title: 'Celechron',
-          home: const HomePage(title: 'Celechron'),
+          title: 'Pcelechron',
+          home: const HomePage(title: 'Pcelechron'),
           initialRoute: '/',
           routes: {
             '/ecardpaypage': (context) => ECardPayPage(),

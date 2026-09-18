@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:celechron/services/notification_service.dart';
-import 'package:celechron/worker/background_refresh_scheduler.dart';
-import 'package:celechron/worker/background_refresh_task.dart';
+import 'package:pcelechron/services/notification_service.dart';
+import 'package:pcelechron/worker/background_refresh_scheduler.dart';
+import 'package:pcelechron/worker/background_refresh_task.dart';
 
 /// 桌面首次检查的延迟。
 ///

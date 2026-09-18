@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Celechron Windows 移植 —— 构建环境
+# Pcelechron Windows 移植 —— 构建环境
 #
 # 用法：source tool/env.sh  然后调用 flutterx 而不是 flutter
 #   flutterx build windows --debug

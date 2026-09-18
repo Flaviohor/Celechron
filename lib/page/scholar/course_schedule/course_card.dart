@@ -1,7 +1,7 @@
-import 'package:celechron/page/scholar/course_detail/course_detail_view.dart';
+import 'package:pcelechron/page/scholar/course_detail/course_detail_view.dart';
 import 'package:flutter/cupertino.dart';
 
-import 'package:celechron/model/session.dart';
+import 'package:pcelechron/model/session.dart';
 
 class SessionCard extends StatefulWidget {
   final List<Session> sessionList;

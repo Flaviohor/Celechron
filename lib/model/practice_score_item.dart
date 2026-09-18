@@ -1,4 +1,4 @@
-import 'package:celechron/utils/json_utils.dart';
+import 'package:pcelechron/utils/json_utils.dart';
 
 /// 实践分来源；明细平台与仅含汇总的教务网来源必须明确区分。
 enum PracticeDataSource {

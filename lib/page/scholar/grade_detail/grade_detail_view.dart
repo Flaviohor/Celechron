@@ -1,15 +1,15 @@
-import 'package:celechron/design/custom_colors.dart';
-import 'package:celechron/utils/tuple.dart';
-import 'package:celechron/model/grade.dart';
-import 'package:celechron/model/semester.dart';
+import 'package:pcelechron/design/custom_colors.dart';
+import 'package:pcelechron/utils/tuple.dart';
+import 'package:pcelechron/model/grade.dart';
+import 'package:pcelechron/model/semester.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:celechron/design/round_rectangle_card.dart';
-import 'package:celechron/design/two_line_card.dart';
-import 'package:celechron/design/persistent_headers.dart';
+import 'package:pcelechron/design/round_rectangle_card.dart';
+import 'package:pcelechron/design/two_line_card.dart';
+import 'package:pcelechron/design/persistent_headers.dart';
 import 'grade_card.dart';
 import 'grade_detail_controller.dart';
-import 'package:celechron/utils/gpa_helper.dart';
+import 'package:pcelechron/utils/gpa_helper.dart';
 import 'weighted_gpa_view.dart';
 
 class GradeDetailPage extends StatelessWidget {

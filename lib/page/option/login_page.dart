@@ -1,7 +1,7 @@
-import 'package:celechron/utils/platform_features.dart';
+import 'package:pcelechron/utils/platform_features.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:celechron/model/scholar.dart';
+import 'package:pcelechron/model/scholar.dart';
 
 import '../../worker/ecard_widget_messenger.dart';
 import 'option_controller.dart';

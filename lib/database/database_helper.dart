@@ -2,12 +2,12 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import 'package:celechron/model/task.dart';
-import 'package:celechron/worker/fuse.dart';
-import 'package:celechron/model/scholar.dart';
-import 'package:celechron/model/period.dart';
-import 'package:celechron/model/option.dart';
-import 'package:celechron/utils/utils.dart';
+import 'package:pcelechron/model/task.dart';
+import 'package:pcelechron/worker/fuse.dart';
+import 'package:pcelechron/model/scholar.dart';
+import 'package:pcelechron/model/period.dart';
+import 'package:pcelechron/model/option.dart';
+import 'package:pcelechron/utils/utils.dart';
 import 'adapters/duration_adapter.dart';
 import 'adapters/scholar_adapter.dart';
 import 'adapters/deadline_adapter.dart';

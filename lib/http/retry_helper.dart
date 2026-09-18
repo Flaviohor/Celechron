@@ -1,4 +1,4 @@
-import 'package:celechron/http/zjuServices/exceptions.dart';
+import 'package:pcelechron/http/zjuServices/exceptions.dart';
 
 const _commonRetryableMessages = <String>[
   "connection closed",

@@ -1,22 +1,22 @@
 import 'package:get/get.dart';
 import 'package:flutter/foundation.dart';
 
-import 'package:celechron/http/zjuServices/exceptions.dart';
-import 'package:celechron/page/option/option_controller.dart';
-import 'package:celechron/services/diagnostic_log_service.dart';
-import 'package:celechron/services/refresh_coordinator.dart';
-import 'package:celechron/utils/json_utils.dart';
-import 'package:celechron/model/practice_score_item.dart';
+import 'package:pcelechron/http/zjuServices/exceptions.dart';
+import 'package:pcelechron/page/option/option_controller.dart';
+import 'package:pcelechron/services/diagnostic_log_service.dart';
+import 'package:pcelechron/services/refresh_coordinator.dart';
+import 'package:pcelechron/utils/json_utils.dart';
+import 'package:pcelechron/model/practice_score_item.dart';
 
 import 'period.dart';
 import 'grade.dart';
 import 'semester.dart';
 import 'todo.dart';
-import 'package:celechron/utils/gpa_helper.dart';
-import 'package:celechron/http/spider.dart';
-import 'package:celechron/http/ugrs_spider.dart';
-import 'package:celechron/http/grs_spider.dart';
-import 'package:celechron/database/database_helper.dart';
+import 'package:pcelechron/utils/gpa_helper.dart';
+import 'package:pcelechron/http/spider.dart';
+import 'package:pcelechron/http/ugrs_spider.dart';
+import 'package:pcelechron/http/grs_spider.dart';
+import 'package:pcelechron/database/database_helper.dart';
 
 class Scholar {
   Scholar();

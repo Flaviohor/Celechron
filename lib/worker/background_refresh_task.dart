@@ -3,13 +3,13 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import 'package:celechron/http/zjuServices/exceptions.dart';
-import 'package:celechron/model/scholar.dart';
-import 'package:celechron/services/diagnostic_log_service.dart';
-import 'package:celechron/services/notification_service.dart';
-import 'package:celechron/services/refresh_coordinator.dart';
-import 'package:celechron/utils/json_utils.dart';
-import 'package:celechron/utils/utils.dart';
+import 'package:pcelechron/http/zjuServices/exceptions.dart';
+import 'package:pcelechron/model/scholar.dart';
+import 'package:pcelechron/services/diagnostic_log_service.dart';
+import 'package:pcelechron/services/notification_service.dart';
+import 'package:pcelechron/services/refresh_coordinator.dart';
+import 'package:pcelechron/utils/json_utils.dart';
+import 'package:pcelechron/utils/utils.dart';
 
 /// 后台刷新的实际工作内容：抓取学业数据并按需发出通知。
 ///

@@ -1,4 +1,4 @@
-import 'package:celechron/design/persistent_headers.dart';
+import 'package:pcelechron/design/persistent_headers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 

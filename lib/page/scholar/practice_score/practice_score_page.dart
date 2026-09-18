@@ -1,6 +1,6 @@
-import 'package:celechron/design/multiple_columns.dart';
-import 'package:celechron/model/practice_score_item.dart';
-import 'package:celechron/model/scholar.dart';
+import 'package:pcelechron/design/multiple_columns.dart';
+import 'package:pcelechron/model/practice_score_item.dart';
+import 'package:pcelechron/model/scholar.dart';
 import 'package:flutter/cupertino.dart';
 
 class PracticeScoreColumns extends StatelessWidget {

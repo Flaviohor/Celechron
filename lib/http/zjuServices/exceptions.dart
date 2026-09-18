@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:celechron/services/diagnostic_log_service.dart';
+import 'package:pcelechron/services/diagnostic_log_service.dart';
 import 'package:flutter/foundation.dart';
 
 const refreshErrorDetailMarker = '\n<<<CELECHRON_ERROR_DETAIL>>>\n';

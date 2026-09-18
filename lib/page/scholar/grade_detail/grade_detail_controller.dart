@@ -1,10 +1,10 @@
-import 'package:celechron/database/database_helper.dart';
+import 'package:pcelechron/database/database_helper.dart';
 import 'package:get/get.dart';
 
-import 'package:celechron/model/semester.dart';
-import 'package:celechron/model/scholar.dart';
-import 'package:celechron/utils/tuple.dart';
-import 'package:celechron/utils/gpa_helper.dart';
+import 'package:pcelechron/model/semester.dart';
+import 'package:pcelechron/model/scholar.dart';
+import 'package:pcelechron/utils/tuple.dart';
+import 'package:pcelechron/utils/gpa_helper.dart';
 
 class GradeDetailController extends GetxController {
   final scholar = Get.find<Rx<Scholar>>(tag: 'scholar');

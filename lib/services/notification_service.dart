@@ -17,7 +17,7 @@ class NotificationService {
   /// - [appUserModelId] 必须与打包时（MSIX / 安装器）写入注册表的值一致，
   ///   否则通知不会显示。
   /// - [guid] 任意固定 GUID 即可，用于 Windows 通知的内部标识。
-  static const String windowsAppName = 'Celechron';
+  static const String windowsAppName = 'Pcelechron';
   static const String windowsAppUserModelId = 'top.celechron.celechron';
   static const String windowsGuid = '7c85e25b-fa7d-489e-9b10-b4c22a3458f0';
 

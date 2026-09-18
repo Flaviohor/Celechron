@@ -3,12 +3,12 @@ import 'package:flutter/cupertino.dart';
 
 import 'package:get/get.dart';
 
-import 'package:celechron/page/scholar/course_list/course_brief_card.dart';
-import 'package:celechron/design/persistent_headers.dart';
-import 'package:celechron/design/round_rectangle_card.dart';
+import 'package:pcelechron/page/scholar/course_list/course_brief_card.dart';
+import 'package:pcelechron/design/persistent_headers.dart';
+import 'package:pcelechron/design/round_rectangle_card.dart';
 
-import 'package:celechron/design/animate_button.dart';
-import 'package:celechron/design/custom_colors.dart';
+import 'package:pcelechron/design/animate_button.dart';
+import 'package:pcelechron/design/custom_colors.dart';
 import 'course_list_controller.dart';
 
 class CourseListPage extends StatelessWidget {

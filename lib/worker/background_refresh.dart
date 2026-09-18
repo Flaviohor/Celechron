@@ -1,4 +1,4 @@
-import 'package:celechron/utils/platform_features.dart';
+import 'package:pcelechron/utils/platform_features.dart';
 import 'background_refresh_desktop.dart';
 import 'background_refresh_mobile.dart';
 import 'background_refresh_scheduler.dart';

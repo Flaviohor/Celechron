@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:get/get.dart';
-import 'package:celechron/algorithm/arrange.dart';
-import 'package:celechron/database/database_helper.dart';
-import 'package:celechron/model/task.dart';
-import 'package:celechron/model/period.dart';
-import 'package:celechron/model/scholar.dart';
-import 'package:celechron/utils/utils.dart';
-import 'package:celechron/pigeon/flow_messenger.dart';
+import 'package:pcelechron/algorithm/arrange.dart';
+import 'package:pcelechron/database/database_helper.dart';
+import 'package:pcelechron/model/task.dart';
+import 'package:pcelechron/model/period.dart';
+import 'package:pcelechron/model/scholar.dart';
+import 'package:pcelechron/utils/utils.dart';
+import 'package:pcelechron/pigeon/flow_messenger.dart';
 
 class FlowController extends GetxController {
   final scholar = Get.find<Rx<Scholar>>(tag: 'scholar');

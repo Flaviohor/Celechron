@@ -4,10 +4,10 @@ import 'package:device_calendar/device_calendar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:timezone/timezone.dart' as tz;
-import 'package:celechron/model/location_mapper.dart';
-import 'package:celechron/model/scholar.dart';
-import 'package:celechron/model/period.dart';
-import 'package:celechron/model/semester.dart';
+import 'package:pcelechron/model/location_mapper.dart';
+import 'package:pcelechron/model/scholar.dart';
+import 'package:pcelechron/model/period.dart';
+import 'package:pcelechron/model/semester.dart';
 
 /// 系统日历同步管理器
 /// 负责创建和管理Celechron课表在系统日历中的同步

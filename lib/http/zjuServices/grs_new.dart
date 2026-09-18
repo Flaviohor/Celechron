@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:celechron/database/database_helper.dart';
-import 'package:celechron/model/exam.dart';
-import 'package:celechron/model/exams_dto.dart';
-import 'package:celechron/model/grade.dart';
-import 'package:celechron/model/session.dart';
-import 'package:celechron/utils/tuple.dart';
+import 'package:pcelechron/database/database_helper.dart';
+import 'package:pcelechron/model/exam.dart';
+import 'package:pcelechron/model/exams_dto.dart';
+import 'package:pcelechron/model/grade.dart';
+import 'package:pcelechron/model/session.dart';
+import 'package:pcelechron/utils/tuple.dart';
 import 'package:flutter/foundation.dart';
 
 import 'exceptions.dart';

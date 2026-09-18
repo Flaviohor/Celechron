@@ -21,4 +21,4 @@ dart tool/link_plugins.dart
 flutterx build windows "$@"
 
 echo
-echo "构建产物：build/windows/x64/runner/Release/Celechron.exe"
+echo "构建产物：build/windows/x64/runner/Release/Pcelechron.exe"

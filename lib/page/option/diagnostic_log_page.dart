@@ -1,5 +1,5 @@
-import 'package:celechron/services/diagnostic_log_service.dart';
-import 'package:celechron/services/diagnostic_report.dart';
+import 'package:pcelechron/services/diagnostic_log_service.dart';
+import 'package:pcelechron/services/diagnostic_report.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 

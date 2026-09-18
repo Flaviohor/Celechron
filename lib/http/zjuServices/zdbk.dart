@@ -1,17 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:celechron/utils/tuple.dart';
+import 'package:pcelechron/utils/tuple.dart';
 import 'package:flutter/foundation.dart';
 
-import 'package:celechron/database/database_helper.dart';
-import 'package:celechron/utils/gpa_helper.dart';
-import 'package:celechron/model/grade.dart';
-import 'package:celechron/model/session.dart';
-import 'package:celechron/model/exams_dto.dart';
-import 'package:celechron/design/captcha_input.dart';
-import 'package:celechron/utils/global.dart';
-import 'package:celechron/services/diagnostic_log_service.dart';
+import 'package:pcelechron/database/database_helper.dart';
+import 'package:pcelechron/utils/gpa_helper.dart';
+import 'package:pcelechron/model/grade.dart';
+import 'package:pcelechron/model/session.dart';
+import 'package:pcelechron/model/exams_dto.dart';
+import 'package:pcelechron/design/captcha_input.dart';
+import 'package:pcelechron/utils/global.dart';
+import 'package:pcelechron/services/diagnostic_log_service.dart';
 import 'exceptions.dart';
 import 'response_utils.dart';
 

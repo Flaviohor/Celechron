@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:celechron/database/database_helper.dart';
-import 'package:celechron/http/zjuServices/exceptions.dart';
-import 'package:celechron/http/zjuServices/zjuam.dart';
-import 'package:celechron/model/practice_score_item.dart';
-import 'package:celechron/services/diagnostic_log_service.dart';
-import 'package:celechron/utils/json_utils.dart';
+import 'package:pcelechron/database/database_helper.dart';
+import 'package:pcelechron/http/zjuServices/exceptions.dart';
+import 'package:pcelechron/http/zjuServices/zjuam.dart';
+import 'package:pcelechron/model/practice_score_item.dart';
+import 'package:pcelechron/services/diagnostic_log_service.dart';
+import 'package:pcelechron/utils/json_utils.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 

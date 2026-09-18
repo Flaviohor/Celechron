@@ -4,7 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart' show PointerHoverEvent, PointerMoveEvent;
 
-import 'package:celechron/utils/platform_features.dart';
+import 'package:pcelechron/utils/platform_features.dart';
 
 /// 桌面端的「液态玻璃 / 沉浸光感」工具组件。
 ///

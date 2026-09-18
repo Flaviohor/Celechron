@@ -1,4 +1,4 @@
-import 'package:celechron/http/zjuServices/courses.dart';
+import 'package:pcelechron/http/zjuServices/courses.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

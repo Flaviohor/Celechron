@@ -1,9 +1,9 @@
-import 'package:celechron/model/exams_dto.dart';
-import 'package:celechron/model/period.dart';
-import 'package:celechron/utils/gpa_helper.dart';
-import 'package:celechron/utils/json_utils.dart';
-import 'package:celechron/utils/list_ext.dart';
-import 'package:celechron/services/diagnostic_log_service.dart';
+import 'package:pcelechron/model/exams_dto.dart';
+import 'package:pcelechron/model/period.dart';
+import 'package:pcelechron/utils/gpa_helper.dart';
+import 'package:pcelechron/utils/json_utils.dart';
+import 'package:pcelechron/utils/list_ext.dart';
+import 'package:pcelechron/services/diagnostic_log_service.dart';
 import 'course.dart';
 import 'exam.dart';
 import 'grade.dart';

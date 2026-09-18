@@ -1,10 +1,10 @@
 import 'dart:math';
 
-import 'package:celechron/utils/tuple.dart';
-import 'package:celechron/model/session.dart';
-import 'package:celechron/design/round_rectangle_card.dart';
-import 'package:celechron/page/scholar/course_schedule/course_card.dart';
-import 'package:celechron/page/calendar/calendar_controller.dart';
+import 'package:pcelechron/utils/tuple.dart';
+import 'package:pcelechron/model/session.dart';
+import 'package:pcelechron/design/round_rectangle_card.dart';
+import 'package:pcelechron/page/scholar/course_schedule/course_card.dart';
+import 'package:pcelechron/page/calendar/calendar_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 

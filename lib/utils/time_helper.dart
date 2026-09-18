@@ -1,4 +1,4 @@
-import 'package:celechron/utils/utils.dart';
+import 'package:pcelechron/utils/utils.dart';
 
 class TimeHelper {
   static final RegExp _chineseCalendarDatePattern = RegExp(

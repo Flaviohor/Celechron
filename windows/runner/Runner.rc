@@ -97,9 +97,9 @@ BEGIN
             VALUE "CompanyName", "org.cc" "\0"
             VALUE "FileDescription", "Celechron - 课程表与学业助手" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "celechron" "\0"
+            VALUE "InternalName", "pcelechron" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 org.cc. All rights reserved." "\0"
-            VALUE "OriginalFilename", "celechron.exe" "\0"
+            VALUE "OriginalFilename", "Pcelechron.exe" "\0"
             VALUE "ProductName", "celechron" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END

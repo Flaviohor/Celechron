@@ -3,9 +3,9 @@ import 'dart:io';
 
 import 'package:workmanager/workmanager.dart';
 
-import 'package:celechron/services/diagnostic_log_service.dart';
-import 'package:celechron/worker/background_refresh_scheduler.dart';
-import 'package:celechron/worker/background_refresh_task.dart';
+import 'package:pcelechron/services/diagnostic_log_service.dart';
+import 'package:pcelechron/worker/background_refresh_scheduler.dart';
+import 'package:pcelechron/worker/background_refresh_task.dart';
 
 /// Workmanager 的 isolate 入口。必须是顶层函数并标记 vm:entry-point。
 @pragma('vm:entry-point')

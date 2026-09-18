@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:celechron/http/zjuServices/response_utils.dart';
-import 'package:celechron/model/semester.dart';
+import 'package:pcelechron/http/zjuServices/response_utils.dart';
+import 'package:pcelechron/model/semester.dart';
 import 'package:flutter/foundation.dart';
 
 const calendarConfigBaseUrl = 'http://calendar.celechron.top/';

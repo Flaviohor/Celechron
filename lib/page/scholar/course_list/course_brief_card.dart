@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 
-import 'package:celechron/model/course.dart';
-import 'package:celechron/design/round_rectangle_card.dart';
-import 'package:celechron/page/scholar/course_detail/course_detail_view.dart';
+import 'package:pcelechron/model/course.dart';
+import 'package:pcelechron/design/round_rectangle_card.dart';
+import 'package:pcelechron/page/scholar/course_detail/course_detail_view.dart';
 
 class CourseBriefCard extends StatelessWidget {
   final Course course;

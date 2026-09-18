@@ -1,13 +1,13 @@
-import 'package:celechron/utils/platform_features.dart';
+import 'package:pcelechron/utils/platform_features.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:url_launcher/url_launcher_string.dart';
 
-import 'package:celechron/utils/utils.dart';
-import 'package:celechron/model/option.dart';
-import 'package:celechron/design/cupertino_async_switch.dart';
-import 'package:celechron/design/glass.dart';
+import 'package:pcelechron/utils/utils.dart';
+import 'package:pcelechron/model/option.dart';
+import 'package:pcelechron/design/cupertino_async_switch.dart';
+import 'package:pcelechron/design/glass.dart';
 
 import 'allow_time_edit_page.dart';
 import 'course_id_mapping_edit_page.dart';

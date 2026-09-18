@@ -4,15 +4,15 @@ import 'package:flutter/material.dart' show Icons;
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-import 'package:celechron/page/scholar/scholar_view.dart';
-import 'package:celechron/page/flow/flow_view.dart';
-import 'package:celechron/page/task/task_view.dart';
-import 'package:celechron/page/calendar/calendar_view.dart';
-import 'package:celechron/page/option/option_view.dart';
+import 'package:pcelechron/page/scholar/scholar_view.dart';
+import 'package:pcelechron/page/flow/flow_view.dart';
+import 'package:pcelechron/page/task/task_view.dart';
+import 'package:pcelechron/page/calendar/calendar_view.dart';
+import 'package:pcelechron/page/option/option_view.dart';
 
-import 'package:celechron/worker/fuse.dart';
-import 'package:celechron/utils/platform_features.dart';
-import 'package:celechron/design/glass.dart';
+import 'package:pcelechron/worker/fuse.dart';
+import 'package:pcelechron/utils/platform_features.dart';
+import 'package:pcelechron/design/glass.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, required this.title});

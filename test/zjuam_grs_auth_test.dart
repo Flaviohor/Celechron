@@ -3,8 +3,8 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:celechron/http/zjuServices/grs_new.dart';
-import 'package:celechron/http/zjuServices/zjuam.dart';
+import 'package:pcelechron/http/zjuServices/grs_new.dart';
+import 'package:pcelechron/http/zjuServices/zjuam.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 

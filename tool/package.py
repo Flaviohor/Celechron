@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""打包 Celechron 的 Windows x64 发行包。
+"""打包 Pcelechron 的 Windows x64 发行包。
 
 产出：
-  dist/Celechron-<ver>-windows-x64-portable.zip   绿色便携版（解压即用）
+  dist/Pcelechron-<ver>-windows-x64-portable.zip   绿色便携版（解压即用）
 
-要点：Celechron.exe 依赖 VC++ 运行时（MSVCP140 / VCRUNTIME140），
+要点：Pcelechron.exe 依赖 VC++ 运行时（MSVCP140 / VCRUNTIME140），
 目标机器没装会直接启动失败。这里从 VS 的可再发行目录取官方 CRT 文件
 做 app-local 部署，包内自带，不再依赖装机环境（Windows 官方支持的部署方式）。
 """
@@ -20,8 +20,8 @@ ROOT = Path(r"E:\celechron-windows")
 BUILD = ROOT / "build" / "windows" / "x64" / "runner" / "Release"
 DIST = ROOT / "dist"
 
-APP_NAME = "Celechron"
-APP_VERSION = "1.3.2"
+APP_NAME = "Pcelechron"
+APP_VERSION = "1.3.3"
 
 # 需要的 CRT 文件（app-local 部署）
 CRT_FILES = [
@@ -122,8 +122,8 @@ def main():
 
 【数据存放位置】
   数据库（Hive）：C:\\Users\\<用户名>\\Documents\\ 下的 db*.hive
-  诊断日志：%TEMP%\\celechron_diagnostic_logs\\
-  刷新锁：  %TEMP%\\celechron_refresh_locks\\
+  诊断日志：%TEMP%\\pcelechron_diagnostic_logs\\
+  刷新锁：  %TEMP%\\pcelechron_refresh_locks\\
   卸载或迁移前请备份上述文件。
 
 【已知限制】

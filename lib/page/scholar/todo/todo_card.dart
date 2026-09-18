@@ -1,5 +1,5 @@
-import 'package:celechron/model/todo.dart';
-import 'package:celechron/utils/utils.dart';
+import 'package:pcelechron/model/todo.dart';
+import 'package:pcelechron/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
 
 class TodoCard extends StatelessWidget {

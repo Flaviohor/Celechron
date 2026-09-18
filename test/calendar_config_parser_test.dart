@@ -1,8 +1,8 @@
-import 'package:celechron/http/calendar_config_parser.dart';
-import 'package:celechron/http/zjuServices/response_utils.dart';
-import 'package:celechron/model/semester.dart';
-import 'package:celechron/model/session.dart';
-import 'package:celechron/services/diagnostic_log_service.dart';
+import 'package:pcelechron/http/calendar_config_parser.dart';
+import 'package:pcelechron/http/zjuServices/response_utils.dart';
+import 'package:pcelechron/model/semester.dart';
+import 'package:pcelechron/model/session.dart';
+import 'package:pcelechron/services/diagnostic_log_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

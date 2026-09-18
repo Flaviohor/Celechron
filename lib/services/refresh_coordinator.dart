@@ -35,7 +35,7 @@ class RefreshCoordinationStore {
   })  : directory = directory ??
             Directory(
               '${Directory.systemTemp.path}${Platform.pathSeparator}'
-              'celechron_refresh_locks',
+              'pcelechron_refresh_locks',
             ),
         foregroundLeaseOwnerId = foregroundLeaseOwnerId ??
             '$pid-${DateTime.now().microsecondsSinceEpoch}',

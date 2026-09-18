@@ -1,16 +1,16 @@
-import 'package:celechron/page/scholar/course_list/course_brief_card.dart';
-import 'package:celechron/design/sub_title.dart';
-import 'package:celechron/design/custom_colors.dart';
-import 'package:celechron/design/persistent_headers.dart';
-import 'package:celechron/design/round_rectangle_card.dart';
+import 'package:pcelechron/page/scholar/course_list/course_brief_card.dart';
+import 'package:pcelechron/design/sub_title.dart';
+import 'package:pcelechron/design/custom_colors.dart';
+import 'package:pcelechron/design/persistent_headers.dart';
+import 'package:pcelechron/design/round_rectangle_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:celechron/model/course.dart';
+import 'package:pcelechron/model/course.dart';
 
-import 'package:celechron/model/exam.dart';
-import 'package:celechron/model/session.dart';
-import 'package:celechron/model/scholar.dart';
+import 'package:pcelechron/model/exam.dart';
+import 'package:pcelechron/model/session.dart';
+import 'package:pcelechron/model/scholar.dart';
 
 class CourseDetailPage extends StatelessWidget {
   final _scholar = Get.find<Rx<Scholar>>(tag: 'scholar');

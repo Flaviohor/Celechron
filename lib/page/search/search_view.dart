@@ -3,8 +3,8 @@ import 'package:extended_sliver/extended_sliver.dart';
 import 'package:flutter/cupertino.dart';
 // KeyDownEvent / LogicalKeyboardKey 在 services 里，cupertino 不会顺带导出。
 import 'package:flutter/services.dart';
-import 'package:celechron/page/scholar/course_list/course_brief_card.dart';
-import 'package:celechron/utils/platform_features.dart';
+import 'package:pcelechron/page/scholar/course_list/course_brief_card.dart';
+import 'package:pcelechron/utils/platform_features.dart';
 import 'package:get/get.dart';
 
 import 'search_controller.dart';

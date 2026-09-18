@@ -257,7 +257,7 @@ class DiagnosticLogService {
   Future<File> _bufferFile() async {
     final logDirectory = Directory(
       '${Directory.systemTemp.path}${Platform.pathSeparator}'
-      'celechron_diagnostic_logs',
+      'pcelechron_diagnostic_logs',
     );
     await logDirectory.create(recursive: true);
     return File(

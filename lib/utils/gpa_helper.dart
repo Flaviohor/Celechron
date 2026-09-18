@@ -1,5 +1,5 @@
-import 'package:celechron/utils/tuple.dart';
-import 'package:celechron/model/grade.dart';
+import 'package:pcelechron/utils/tuple.dart';
+import 'package:pcelechron/model/grade.dart';
 
 class GpaHelper {
   static Tuple<List<double>, double> calculateGpa(Iterable<Grade> grades) {

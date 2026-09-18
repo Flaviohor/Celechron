@@ -1,4 +1,4 @@
-; Celechron Windows 安装器脚本（Inno Setup 6）
+; Pcelechron Windows 安装器脚本（Inno Setup 6）
 ;
 ; 一份脚本同时服务本地与 CI，差异全部走命令行 /D 覆盖。
 ;
@@ -7,7 +7,7 @@
 ;
 ; 本地（推荐：从 tool/package.py 生成的暂存目录取文件，包内已含 app-local
 ; VC++ 运行库，目标机器无需另装运行库）：
-;   ISCC.exe /DStageDir=E:\celechron-windows\dist\Celechron-1.3.0-windows-x64 tool\installer.iss
+;   ISCC.exe /DStageDir=E:\celechron-windows\dist\Pcelechron-1.3.0-windows-x64 tool\installer.iss
 ;
 ; CI（.github/workflows/build_desktop.yml 调用）：
 ;   ISCC.exe /DAppVersion=<pubspec 版本> /DArchLabel=x64 /DBuildDir=x64 ^
@@ -15,11 +15,11 @@
 ;
 ; 可覆盖开关：AppVersion / ArchLabel / BuildDir / SourceRoot / StageDir / OutputDir
 ; 产物统一落在 {#OutputDir}（默认 installer_output\），文件名
-;   Celechron-<版本>-windows-<架构>-setup.exe
+;   Pcelechron-<版本>-windows-<架构>-setup.exe
 
-#define AppName      "Celechron"
-#define AppExeName   "Celechron.exe"
-#define AppPublisher "Celechron contributors"
+#define AppName      "Pcelechron"
+#define AppExeName   "Pcelechron.exe"
+#define AppPublisher "Pcelechron contributors"
 #define AppURL       "https://github.com/Celechron/Celechron"
 
 ; ---- 开关默认值：命令行给了就用命令行的（#ifndef 只在未定义时生效）----
@@ -148,7 +148,7 @@ procedure InitializeWizard();
 begin
   RemoveDataPage := CreateInputOptionPage(wpSelectTasks,
     '数据清理设置', '是否在卸载时删除本地数据',
-    'Celechron 的数据库保存在「文档」文件夹下（dbuser.hive 等）。' + #13#10 +
+    'Pcelechron 的数据库保存在「文档」文件夹下（dbuser.hive 等）。' + #13#10 +
     '选择「是」表示卸载本程序时一并删除这些文件（登录信息与本地缓存会丢失，不可恢复）。' + #13#10 +
     '默认保留，卸载后可手动删除。',
     True, False);

@@ -1,5 +1,5 @@
-import 'package:celechron/model/period.dart';
-import 'package:celechron/utils/utils.dart';
+import 'package:pcelechron/model/period.dart';
+import 'package:pcelechron/utils/utils.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:uuid/uuid.dart';
 import 'package:hive/hive.dart';

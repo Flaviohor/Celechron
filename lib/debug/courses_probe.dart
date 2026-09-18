@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' show SelectableText;
-import 'package:celechron/http/zjuServices/courses.dart';
-import 'package:celechron/http/zjuServices/zjuam.dart';
+import 'package:pcelechron/http/zjuServices/courses.dart';
+import 'package:pcelechron/http/zjuServices/zjuam.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

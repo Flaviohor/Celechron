@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:celechron/http/zjuServices/sztz.dart';
-import 'package:celechron/http/zjuServices/zjuam.dart';
+import 'package:pcelechron/http/zjuServices/sztz.dart';
+import 'package:pcelechron/http/zjuServices/zjuam.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 String ctxResponse(Map<String, dynamic> context) => jsonEncode({

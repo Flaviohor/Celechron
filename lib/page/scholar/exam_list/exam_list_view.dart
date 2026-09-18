@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 
-import 'package:celechron/model/exam.dart';
-import 'package:celechron/design/sub_title.dart';
-import 'package:celechron/design/persistent_headers.dart';
-import 'package:celechron/design/round_rectangle_card.dart';
-import 'package:celechron/design/animate_button.dart';
-import 'package:celechron/design/custom_colors.dart';
+import 'package:pcelechron/model/exam.dart';
+import 'package:pcelechron/design/sub_title.dart';
+import 'package:pcelechron/design/persistent_headers.dart';
+import 'package:pcelechron/design/round_rectangle_card.dart';
+import 'package:pcelechron/design/animate_button.dart';
+import 'package:pcelechron/design/custom_colors.dart';
 
 import 'exam_list_controller.dart';
 
